@@ -132,8 +132,8 @@ XLoadFont(Display * dpy, _Xconst char *name)
 	if (fontname)
 		font = GrCreateFont(fontname, 0, NULL);
 
+printf("XLoadFont('%s') = '%s' [%d]\n", name, fontname, font);
 	if (fontname)
 		Xfree(fontname);
-printf("XLoadFont('%s') = '%s' [%d]\n", name, fontname, font);
 	return font;
 }
