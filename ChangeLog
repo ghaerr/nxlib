@@ -1,3 +1,10 @@
+	* fixed 'p' entry in mwscan_to_mwkey
+	* added X headers to nxlib distribution, X11 now not required to build
+	* added Jordan's mods for better GTK compatibility:
+		XwcTextListToProperty, XwcPropertyToTextList, XWcFreeTextList
+		fixed XPutImage w/src_x not 0 or unequal widths
+		stubbed out XCreateFontSet
+		added XGetSelectionOwner, XSetSelectionOwner, XConvertCase
 	* temp kluged problem with X11 width/height vs NX radius for arc specs
 	* fixed XDrawRectangle, XDrawArc width/height +1 bug
 	* fixed angle1/angle2 difference between X11 and Nano-X in XDraw/FillArc
