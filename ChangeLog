@@ -1,3 +1,6 @@
+	* temp kluged problem with X11 width/height vs NX radius for arc specs
+	* fixed XDrawRectangle, XDrawArc width/height +1 bug
+	* fixed angle1/angle2 difference between X11 and Nano-X in XDraw/FillArc
 Version 0.44 - 1 June 2002 - greg@censoft.com
 	* fixed GrGetColorByName return value
 	* added XMapSubwindows for xpilot

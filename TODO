@@ -1,3 +1,7 @@
+clipping on oval windows on fltk forms
+width/height vs radius in Arc draws buggy for all even widths
+	fltk valuators dial problems, arc/fill borders incorrect
+	fltk forms round down border problem, fltk radio buttons
 make Xt programs work
 handle shift/control/alt in X kbd state
 get scancode keymap from microwindows
