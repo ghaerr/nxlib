@@ -9,7 +9,6 @@ XCopyArea(Display * display, Drawable src, Drawable dest, GC gc,
 	int rop = _nxConvertROP(vp->function);
 
 	// FIXME - use GC fg/bg for depth == 1 pixmaps
-printf("XCopyArea %d -> %d\n", src, dest);
 	GrCopyArea(dest, gc->gid, dest_x, dest_y, width, height, src, src_x,
 		   src_y, rop);
 	return 1;

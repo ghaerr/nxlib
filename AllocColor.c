@@ -140,7 +140,7 @@ XAllocColor(Display * display, Colormap colormap, XColor * in_out)
 			in_out->pixel = RGB2PIXEL888(red, green, blue);
 			break;
 		}
-printf("XAllocColor in %x,%x,%x out %x\n", in_out->red, in_out->green, in_out->blue, in_out->pixel);
+//printf("XAllocColor in %x,%x,%x out %x\n", in_out->red, in_out->green, in_out->blue, in_out->pixel);
 		return 1;
 
 	}

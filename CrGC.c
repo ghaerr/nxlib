@@ -330,7 +330,7 @@ XSetDashes(Display * display, GC gc, int dash_offset,
 	   _Xconst char *dash_list, int n)
 {
 	if (dash_offset)
-		printf("XSetDashes:  We don't support dash offset yet\n");
+		printf("XSetDashes: dash offset not implemented\n");
 
 	GrSetGCDash(gc->gid, (char *)dash_list, n);
 	return 1;

@@ -332,8 +332,8 @@ return 1; // must return, will crash server
 		printf("XPutImage: unsupported bpp %d\n", image->bits_per_pixel);
 	}
 printf("putTrueColorImage nxmode = %d\n", mode);
-if (mode == MWPF_TRUECOLOR555 || mode == MWPF_TRUECOLOR565)
-{
+#if 0000
+if (mode == MWPF_TRUECOLOR555 || mode == MWPF_TRUECOLOR565) {
 	unsigned short *s;
 	int x, y;
 	for (y=0; y<height; ++y) {
@@ -343,7 +343,7 @@ if (mode == MWPF_TRUECOLOR555 || mode == MWPF_TRUECOLOR565)
 		printf("\n");
 	}
 }
-printf("GRAREA %d\n", d);
+#endif
 	GrArea((GR_WINDOW_ID)d, (GR_GC_ID)gc->gid, dest_x, dest_y,
 	       width, height, src, mode);
 

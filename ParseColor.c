@@ -12,7 +12,7 @@ _parseColorStr(_Xconst char **str, int size)
 	unsigned long val;
 
 	strncpy(parse, *str, size);
-	parse[size + 1] = 0;
+	parse[size + 1] = '\0';
 	val = strtol(parse, 0, 16);
 	*str += size;
 	return (val);
@@ -20,7 +20,7 @@ _parseColorStr(_Xconst char **str, int size)
 
 Status
 XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
-	    XColor * exact)
+	XColor *exact)
 {
 	int r, g, b;
 
@@ -28,18 +28,17 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 	if (strncmp(spec, "rgb:", 4) == 0) {
 		sscanf(spec + 4, "%x/%x/%x", &r, &g, &b);
 	} else {
-		_Xconst char *p = spec + 1;
-		unsigned long val;
-
 		if (spec[0] != '#') {
-			/* Eh, try to parse the color name */
+			/* try to parse the color name */
 			if (GrGetColorByName((char *) spec, &r, &g, &b) == 0) {
 				printf("XParseColor: bad parse on %s\n", spec);
 				return 0;
 			}
 		} else {
-			switch (strlen(p)) {
+			_Xconst char *p = spec + 1;
+			unsigned long val;
 
+			switch (strlen(p)) {
 			case 3:
 				r = _parseColorStr(&p, 1);
 				g = _parseColorStr(&p, 1);

@@ -1,7 +1,7 @@
+Version 0.44 - 31 May 2002 - greg@censoft.com
 	* fixed GrGetColorByName return value
 	* added XMapSubwindows for xpilot
 	* added XKeycodeToKeysym
-Version 0.44 - 30 May 2002 - greg@censoft.com
 	* return XKeyEvent.keycode as scancode (must be < 256 for FLTK)
 	* add standard scancode table for XKeycodeToKeysym
 	* implement XKeycodeToKeysym, rewrite XLookupKeysym

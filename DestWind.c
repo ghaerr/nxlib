@@ -10,7 +10,6 @@ XDestroyWindow(Display * dpy, Window w)
 	/* Delete all window properties */
 	_nxDelAllProperty(w);
 
-	printf("XDestroyWindow [%d]\n", w);
 	GrDestroyWindow(w);
 	return 1;
 }

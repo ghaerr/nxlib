@@ -73,8 +73,7 @@ XQueryFont(Display * dpy, XID font_ID)
 
 	/* no font properties yet*/
 
-printf("Font %d byte1 %d,%d byte2 %d,%d\n", font_ID, fs->min_byte1, fs->max_byte1,
-fs->min_char_or_byte2, fs->max_char_or_byte2);
+//printf("Font %d byte1 %d,%d byte2 %d,%d\n", font_ID, fs->min_byte1, fs->max_byte1, fs->min_char_or_byte2, fs->max_char_or_byte2);
 
 	return fs;
 }
