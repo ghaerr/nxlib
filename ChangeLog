@@ -1,3 +1,4 @@
+	* fix XQueryFont for fonts with firstchar > 256
 	* added to CVS
 	* changed decl for XrmLocaleOfDatabase (removed XCONST)
 	* comment out XSetTSOrigin for fltk test/bitmap

@@ -61,7 +61,8 @@ XQueryFont(Display * dpy, XID font_ID)
 			if (i-finfo.firstchar >= size)
 				break;
 			cs->lbearing = 0;
-			cs->rbearing = finfo.fixed? finfo.maxwidth: finfo.widths[i];
+			/* FIXME, we need a real widths table*/
+			cs->rbearing = (finfo.fixed || i>255)? finfo.maxwidth: finfo.widths[i];
 			cs->width = cs->rbearing;	/* FIXME*/
 			cs->ascent = finfo.baseline;
 			cs->descent = finfo.height - finfo.baseline;
