@@ -137,7 +137,6 @@ int XFreeModifiermap() { printf("XFreeModifiermap called\n"); return 0; }
 int XGetInputFocus() { printf("XGetInputFocus called\n"); return 0; } 
 int XGetModifierMapping() { printf("XGetModifierMapping called\n"); return 0; } 
 int XGetWMColormapWindows() { printf("XGetWMColormapWindows called\n"); return 0; } 
-int XKeycodeToKeysym() { printf("XKeycodeToKeysym called\n"); return 0; } 
 int XKeysymToKeycode() { printf("XKeysymToKeycode called\n"); return 0; } 
 int XKeysymToString() { printf("XKeysymToString called\n"); return 0; } 
 int XListHosts() { printf("XListHosts called\n"); return 0; } 

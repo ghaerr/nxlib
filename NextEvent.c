@@ -206,7 +206,7 @@ translateNXEvent(Display *dpy, GR_EVENT * ev, XEvent * event)
 			event->xkey.y = pev->y;;
 			event->xkey.x_root = pev->rootx;
 			event->xkey.y_root = pev->rooty;
-			event->xkey.keycode = pev->ch;
+			event->xkey.keycode = pev->scancode; /* note: not mwkey value*/
 			event->xkey.same_screen = True;
 
 			if (pev->modifiers & MWKMOD_CTRL)

@@ -1,3 +1,5 @@
+handle shift/control/alt in X kbd state
+get scancode keymap from microwindows
 fill in events for UPDATE event handling
 	fix in .window and .parent locations for *Notify events
 send ReparentNotify seperately in addition to ConfigureNotify
