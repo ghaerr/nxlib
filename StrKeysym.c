@@ -191,6 +191,18 @@ XStringToKeysym(_Xconst char *string)
 	return NoSymbol;
 }
 
+/* translate KeySym to KeyCode*/
+KeyCode
+XKeysymToKeycode(Display *dpy, KeySym ks)
+{
+	int i;
+
+	for (i=0; i<128; ++i)
+		if (mwscan_to_mwkey[i] == ks)
+			return i;
+	return NoSymbol;
+}
+
 #if 0000
 /*
  * Microwindows ttyscan.c compatible scancode conversion
