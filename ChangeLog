@@ -1,3 +1,4 @@
+	* added XAllocWMHints, XAllocSizeHints for FLTK 1.1.4
 Version 0.45 - 11 Aug 2003 - greg@censoft.com
 	* fixed 'p' entry in mwscan_to_mwkey
 	* added X headers to nxlib distribution, X11 now not required to build

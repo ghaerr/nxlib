@@ -26,7 +26,6 @@ int XShapeCombineRectangles() { printf("XShapeCombineRectangles called\n"); retu
 int XShapeGetRectangles() { printf("XShapeGetRectangles called\n"); return 0; } 
 int XAddConnectionWatch() { printf("XAddConnectionWatch called\n"); return 0; } 
 int XProcessInternalConnection() { printf("XProcessInternalConnection called\n"); return 0;}
-int XAllocWMHints() { printf("XAllocWMHints called\n"); return 0;}
 int XCopyGC() { printf("XCopyGC called\n"); return 0;}
 int XGetSubImage() { printf("XGetSubImage called\n"); return 0;}
 int XGetMotionEvents() { printf("XGetMotionEvents called\n"); return 0;}
@@ -134,7 +133,6 @@ int XInstallColormap() { printf("XInstallColormap called\n"); return 0; }
 int XReconfigureWMWindow() { printf("XReconfigureWMWindow called\n"); return 0; } 
 int XSetWindowColormap() { printf("XSetWindowColormap called\n"); return 0; } 
 int XUninstallColormap() { printf("XUninstallColormap called\n"); return 0; } 
-int XAllocSizeHints() { printf("XAllocSizeHints called\n"); return 0; } 
 int XConfigureWindow() { printf("XConfigureWindow called\n"); return 0; } 
 int XForceScreenSaver() { printf("XForceScreenSaver called\n"); return 0; } 
 int XFreeModifiermap() { printf("XFreeModifiermap called\n"); return 0; } 

@@ -40,6 +40,18 @@ XSetWMClassHints(Display * display, Window w, XClassHint * hints)
 {
 }
 
+XSizeHints *
+XAllocSizeHints(void)
+{
+	return (XSizeHints *)Xcalloc(1, (unsigned)sizeof(XSizeHints));
+}
+
+XWMHints *
+XAllocWMHints(void)
+{
+	return (XWMHints *)Xcalloc(1, (unsigned)sizeof(XWMHints));
+}
+
 void
 XSetWMProperties(Display * display, Window w, XTextProperty * window_name,
 	XTextProperty * icon_name, char **argv, int argc,
