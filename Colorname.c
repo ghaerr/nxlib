@@ -46,7 +46,7 @@ GrGetColorByName(char *colorname, int *retr, int *retg, int *retb)
 
 	fp = fopen(X11_RGBTXT, "r");
 	if (!fp)
-		return -1;
+		return 0;
 
 	while (fgets(buf, 256, fp) != NULL) {
 		if (buf[0] != '!') {
@@ -71,7 +71,7 @@ GrGetColorByName(char *colorname, int *retr, int *retg, int *retb)
 	}
 	fclose(fp);
 
-	return -1;
+	return 0;
 }
 
 Status

@@ -1,3 +1,4 @@
+make Xt programs work
 handle shift/control/alt in X kbd state
 get scancode keymap from microwindows
 fill in events for UPDATE event handling

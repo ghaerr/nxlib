@@ -24,9 +24,9 @@ X11_RGBTXT=/usr/lib/X11/rgb.txt
 # set to Y to make shared X11 libs
 SHAREDLIB=Y
 LIBNAME = X11
-SOLIBREV = 6.1
-xSOLIBREV = 6.2
-xCFLAGS += -DXCONST=_Xconst
+xSOLIBREV = 6.1
+SOLIBREV = 6.2
+CFLAGS += -DXCONST=_Xconst
 
 # set to Y to include (unmodifed X11) Xrm routines
 INCLUDE_XRM=Y

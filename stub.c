@@ -1,5 +1,12 @@
 #include <stdio.h>
 
+int XScreenResourceString() { printf("XScreenResourceString called\n"); return 0; } 
+int XWMGeometry() { printf("XWMGeometry called\n"); return 0; } 
+int XGetIconSizes() { printf("XGetIconSizes called\n"); return 0; } 
+int XQueryBestCursor() { printf("XQueryBestCursor called\n"); return 0; } 
+int XSetState() { printf("XSetState called\n"); return 0; } 
+int XResourceManagerString() { printf("XResourceManagerString called\n"); return 0; } 
+int XrmParseCommand() { printf("XrmParseCommand called\n"); return 0; } 
 int XQueryKeymap() { printf("XQueryKeymap called\n"); return 0; } 
 int XGetDefault() { printf("XGetDefault called\n"); return 0; } 
 int XRecolorCursor() { printf("XRecolorCursor called\n"); return 0; } 
@@ -116,7 +123,7 @@ int XSetStandardProperties() { printf("XSetStandardProperties called\n"); return
 int XSetNormalHints() { printf("XSetNormalHints called\n"); return 0; }
 int XSetTransientForHint() { printf("XSetTransientForHint called\n"); return 0; } 
 int XSetWMProtocols() { printf("XSetWMProtocols called\n"); return 0; } 
-int XSupportsLocale() { printf("XSupportsLocale called\n"); return 0; } 
+int XSupportsLocale() { printf("XSupportsLocale called\n"); return 1; } 
 int XSynchronize() { printf("XSynchronize called\n"); return 0; } 
 int XUngrabKeyboard() { printf("XUngrabKeyboard called\n"); return 0; } 
 int XUngrabPointer() { printf("XUngrabPointer called\n"); return 0; } 

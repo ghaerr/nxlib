@@ -24,7 +24,7 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 {
 	int r, g, b;
 
-	/* This is the new and prefered way */
+	/* This is the new and preferred way */
 	if (strncmp(spec, "rgb:", 4) == 0) {
 		sscanf(spec + 4, "%x/%x/%x", &r, &g, &b);
 	} else {
@@ -33,7 +33,7 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 
 		if (spec[0] != '#') {
 			/* Eh, try to parse the color name */
-			if (GrGetColorByName((char *) spec, &r, &g, &b) == -1) {
+			if (GrGetColorByName((char *) spec, &r, &g, &b) == 0) {
 				printf("XParseColor: bad parse on %s\n", spec);
 				return 0;
 			}
