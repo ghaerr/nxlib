@@ -9,7 +9,7 @@ typedef struct _keysym_map {
 	KeySym xKey;
 } KeySymMap;
 
-static KeySymMap _kmap[] = {
+static KeySymMap kmap[] = {
 	{MWKEY_RIGHT, XK_Right},
 	{MWKEY_LEFT, XK_Left},
 	{MWKEY_UP, XK_Up},
@@ -57,11 +57,11 @@ static KeySymMap _kmap[] = {
 KeySym
 XLookupKeysym(register XKeyEvent * event, int col)
 {
-	int i = 0;
+	int i;
 
-	for (i = 0; _kmap[i].nxKey != 0xffff; i++) {
-		if (event->keycode == _kmap[i].nxKey)
-			return _kmap[i].xKey;
+	for (i=0; kmap[i].nxKey != 0xffff; i++) {
+		if (event->keycode == kmap[i].nxKey)
+			return kmap[i].xKey;
 	}
 
 	return event->keycode;
@@ -69,14 +69,13 @@ XLookupKeysym(register XKeyEvent * event, int col)
 
 int
 XLookupString(register XKeyEvent * event, char *buffer,
-	      int nbytes, KeySym * keysym, XComposeStatus * status)
+	int nbytes, KeySym * keysym, XComposeStatus * status)
 {
 	if (nbytes > 0)
 		buffer[0] = 0;
 
 	*keysym = XLookupKeysym(event, 0);
 	return 0;
-
 }
 
 /* Freeking ugly! */
@@ -85,7 +84,7 @@ XStringToKeysym(_Xconst char *string)
 {
 	int i;
 
-	for (i = 0; i < NX_KEYSYMSTR_COUNT; i++)
+	for (i=0; i < NX_KEYSYMSTR_COUNT; i++)
 		if (strcmp(nxKeyStrings[i].str, string) == 0)
 			return nxKeyStrings[i].keysym;
 
