@@ -1,7 +1,9 @@
+/* Portions Copyright 2003, Jordan Crouse (jordan@cosmicpenguin.net) */
+
 #include "nxlib.h"
 #include <string.h>
-#include <X11/keysym.h>
-#include <X11/Xutil.h>
+#include "keysym.h"
+#include "Xutil.h"
 #include "keysymstr.h"
 
 /* Standard keymapings for kernel values */
@@ -13,7 +15,7 @@ MWKEY_UNKNOWN, MWKEY_ESCAPE, '1', '2', '3',				/* 0*/
 '9', '0', '-', '=', MWKEY_BACKSPACE,					/* 10*/
 MWKEY_TAB, 'q', 'w', 'e', 'r',						/* 15*/
 't', 'y', 'u', 'i', 'o',						/* 20*/
-'o', '[', ']', MWKEY_ENTER, MWKEY_LCTRL,				/* 25*/
+'p', '[', ']', MWKEY_ENTER, MWKEY_LCTRL,				/* 25*/
 'a', 's', 'd', 'f', 'g',						/* 30*/
 'h', 'j', 'k', 'l', ';',						/* 35*/
 '\'', '`', MWKEY_LSHIFT, '\\', 'z',					/* 40*/
@@ -203,6 +205,19 @@ XKeysymToKeycode(Display *dpy, KeySym ks)
 	return NoSymbol;
 }
 
+/* Translate the keysym to upper case and lower case */
+
+void
+XConvertCase(KeySym in, KeySym *upper, KeySym *lower)
+{
+	if (in & MWKEY_NONASCII_MASK) 
+		*upper = *lower = in;
+	else {
+		*upper = (in >= 'a' && in <= 'z')? in-'a'+'A': in;
+		*lower = (in >= 'A' && in <= 'A')? in-'A'+'a': in;
+	}
+}
+  
 #if 0000
 /*
  * Microwindows ttyscan.c compatible scancode conversion

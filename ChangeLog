@@ -1,3 +1,4 @@
+Version 0.45 - 11 Aug 2003 - greg@censoft.com
 	* fixed 'p' entry in mwscan_to_mwkey
 	* added X headers to nxlib distribution, X11 now not required to build
 	* added Jordan's mods for better GTK compatibility:
@@ -8,7 +9,7 @@
 	* temp kluged problem with X11 width/height vs NX radius for arc specs
 	* fixed XDrawRectangle, XDrawArc width/height +1 bug
 	* fixed angle1/angle2 difference between X11 and Nano-X in XDraw/FillArc
-Version 0.44 - 1 June 2002 - greg@censoft.com
+Version 0.44 - 1 June 2003 - greg@censoft.com
 	* fixed GrGetColorByName return value
 	* added XMapSubwindows for xpilot
 	* added XKeycodeToKeysym
@@ -20,13 +21,13 @@ Version 0.44 - 1 June 2002 - greg@censoft.com
 	* changed decl for XrmLocaleOfDatabase (removed XCONST)
 	* comment out XSetTSOrigin for fltk test/bitmap
 	* added XQueryKeymap for fltk 1.0.11 build
-Version 0.43 - 18 May 2002 - greg@censoft.com
+Version 0.43 - 18 May 2003 - greg@censoft.com
 	* fixed XQueryPointer return values
 	* fixed ConfigureNotify notifications, UPDATE event reporting
 	* hack XWindowEvent for FLTK NoExpose requirement w/XCopyArea
 	* changed behaviour of XQLength to make FLTK select loop work
 	* added XGetDefault, XRecolorCursor stub for FLTK 1.0.11 port
-Version 0.42 - 12 Apr 2002 - greg@censoft.com
+Version 0.42 - 12 Apr 2003 - greg@censoft.com
 	* fixed bad reporting of state&button data for some events
 	* fixed MotionNotify event reporting, added XPutBackEvent for qt
 	* fixed popup menus by reading override_noredirect flags

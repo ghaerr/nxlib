@@ -1,6 +1,6 @@
 #include "nxlib.h"
 #include <string.h>
-#include <X11/Xatom.h>
+#include "Xatom.h"
 
 char **
 _nxGetFontDir(int *count)

@@ -1,6 +1,6 @@
 #include "nxlib.h"
 #include <string.h>
-#include <X11/Xutil.h>
+#include "Xutil.h"
 
 void
 XSetWMName(Display * display, Window w, XTextProperty * name)

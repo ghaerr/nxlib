@@ -49,15 +49,15 @@ from The Open Group.
 
 #include	<stdio.h>
 #include	<ctype.h>
-//#include	"Xlibint.h"
+/*#include	"Xlibint.h"*/
 #include	"nxlib.h"
-#include	<X11/Xresource.h>
+#include	"Xresource.h"
 #include	"Xlcint.h"
 #ifdef XTHREADS
 #include	"locking.h"
 #endif
 #include 	"XrmI.h"
-#include	<X11/Xos.h>
+#include	"Xos.h"
 
 #ifdef __STDC__
 #define Const const
@@ -2658,7 +2658,7 @@ static void DestroyNTable(table)
     Xfree((char *)table);
 }
 
-/*XCONST*/ char *
+XCONST char *
 XrmLocaleOfDatabase(db)
     XrmDatabase db;
 {

@@ -1,7 +1,23 @@
+/* StrToText.c - String conversion and TextProperty functions */
+
+/* Portions Copyright 2003, Jordan Crouse (jordan@cosmicpenguin.net) */
+
+/* News and Notes:
+   GTK+ in default mode uses the TextProperty functions to convert back and
+   forth from wide char mode to the current locale mode.  Thus, we have included
+   XwcTextListToTextProperty and XwcTextPropertyToTextList.  
+
+   I am probably not using the wide char functions correctly, and if I am not,
+   then please adjust them accordingly.  
+*/
+
 #include "nxlib.h"
+#include <stdlib.h>
 #include <string.h>
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
+#include <wchar.h>
+
+#include "Xutil.h"
+#include "Xatom.h"
 
 Status
 XStringListToTextProperty(char **argv, int argc, XTextProperty * ret)
@@ -21,6 +37,7 @@ XStringListToTextProperty(char **argv, int argc, XTextProperty * ret)
 		proto.nitems = count - 1;
 
 		buffer = (char *) Xmalloc(count);
+
 		if (!buffer)
 			return 0;
 
@@ -43,5 +60,127 @@ XStringListToTextProperty(char **argv, int argc, XTextProperty * ret)
 	}
 
 	memcpy(ret, &proto, sizeof(*ret));
-	return 1;
+	return Success;
+}
+
+/* 
+   Just a proxy call to XStringListToTextProperty for the moment.
+   Eventually we'll have to deal with the style 
+*/
+int
+XmbTextListToTextProperty(Display *display, char **list, int count, 
+	XICCEncodingStyle style, XTextProperty *text_prop_return)
+{
+	return XStringListToTextProperty(list, count, text_prop_return);
+}
+
+/* Ok - we try to convert this before storing.  We should be converting into our current
+   locale, blah, blah - but I don't know what to do for that.  So we just convert from
+   wchar_t back to char_t and store that.
+*/
+int
+XwcTextListToTextProperty(Display *display, wchar_t **list, int count, 
+	XICCEncodingStyle style, XTextProperty *text_prop_return)
+{
+	char **strs = 0;
+	int i, l, ret;
+
+	if (!count)
+		return Success;
+	
+	strs = (char **) malloc(count * sizeof(char *));
+	if (!strs) return XNoMemory;
+	       
+	for(i = 0; i < count; i++) {
+		wchar_t *wstr = list[i];
+		char *ptr = 0;
+		int len = wcslen(wstr);
+
+		ptr = strs[i] = (char *) calloc(wcslen(wstr) + 1, sizeof(char));
+		if (!strs[i]) continue;
+
+		for(l = 0; l < len; l++) {
+			int ch = wctob(*wstr++);
+			if (ch != EOF) *ptr++ = ch;
+		}
+	}
+
+	ret = XStringListToTextProperty((char **) strs, count, text_prop_return);
+
+	/* Free the converted functions */
+
+	for(i = 0; i < count; i++) 
+		if (strs[i]) free(strs[i]);
+	
+	free(strs);
+	return ret;       
+}
+
+/* This converts the text property into wide characters.  */
+/* FIXME:  This does not take into account unconvertable characters */
+int
+XwcTextPropertyToTextList(Display* display, const XTextProperty* text_prop,
+	wchar_t*** list_return, int* count_return)
+{
+	char *value = text_prop->value;
+	wchar_t **ret = 0;
+	int count = 0;
+
+	/* Nothing to encode */
+
+	if (!text_prop->nitems) {
+		*count_return = 0;
+		*list_return = 0;
+		return Success;
+	}
+
+
+	while(1) {
+		wchar_t *rptr;
+		char *vptr = value;
+		int l;
+
+		if (!*value) break;
+
+		if (!ret) 
+			ret = (wchar_t **) malloc((count + 1) * sizeof(wchar_t *));
+		else
+			ret = (wchar_t **) realloc(ret, (count + 1) * sizeof(wchar_t *));
+
+		if (!ret) return XNoMemory;
+		rptr = ret[count] = (wchar_t *) calloc(sizeof(wchar_t), strlen(value) + 1);
+
+		if (!ret[count]) 
+			goto next_string;
+
+		for(l = 0; l < strlen(value); l++) 
+			*rptr++ = btowc(*vptr++);
+		
+		*rptr++ = L'\0';
+		count++;
+
+	next_string:
+		value += strlen(value) + 1;
+	}
+
+	ret = (wchar_t **) realloc(ret, (count + 1) * sizeof(wchar_t *));
+	ret[count] = 0;
+
+	*list_return = ret;
+	*count_return = count;
+
+	return Success;
+}
+
+void
+XwcFreeStringList(wchar_t **list)
+{
+	int i = 0;
+
+	if (!list)
+		return;
+
+	for(i = 0; list[i]; i++)
+		free(list[i]);
+	free(list);
 }

@@ -47,9 +47,9 @@ from The Open Group.
 */
 /* $XFree86: xc/lib/X11/Quarks.c,v 1.3 2001/01/17 19:41:42 dawes Exp $ */
 
-//#include "Xlibint.h"
+/*#include "Xlibint.h"*/
 #include "nxlib.h"
-#include <X11/Xresource.h>
+#include "Xresource.h"
 
 /* Not cost effective, at least for vanilla MIT clients */
 /* #define PERMQ */

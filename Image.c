@@ -1,6 +1,9 @@
+/* Portions Copyright 2003, Jordan Crouse (jordan@cosmicpenguin.net) */
+
 #define MWINCLUDECOLORS
 #include "nxlib.h"
 #include <stdlib.h>
+#include <string.h>
 
 /*
  * X Image routines.  Messy.  Not done yet.
@@ -156,8 +159,9 @@ createImageStruct(unsigned int width, unsigned int height, unsigned int depth,
 
 	image->bits_per_pixel = depth;
 
-printf("createImage: %d,%d format %d depth %d bytespl %d\n", width, height, format, depth, image->bytes_per_line);
-
+#ifdef DEBUG
+	printf("createImage: %d,%d format %d depth %d bytespl %d\n", width, height, format, depth, image->bytes_per_line);
+#endif
 
 	// FIXME check
 	image->red_mask = red_mask;
@@ -290,6 +294,50 @@ XGetImage(Display * display, Drawable d, int x, int y,
  * Output a non-palettized image.  Never uses colormap, but instead
  * uses GrArea with image depth parameter for server conversion.
  */
+
+/* This takes a portion of the image buffer and rearranges it to keep from 
+   freaking out GrArea. This will take into account a shifted src_x 
+   (or a width that is not as large as the declared image width).
+*/
+
+static void
+showPartialImage(GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect, GR_RECT *drect, char *src, int mode)
+{
+	char *dst = 0, *local = 0;
+	char *ptr = src;  /* This will already be adjusted to the inital X and Y of the image */
+	int r, size = 0;
+
+	switch(mode) {
+	case MWPF_TRUECOLOR332: 
+		size = 1; break;
+	case MWPF_TRUECOLOR555:
+	case MWPF_TRUECOLOR565:
+		size = 2; break;
+	case MWPF_TRUECOLOR888:
+		size = 3; break;
+	case MWPF_TRUECOLOR0888:
+		size = 4; break;
+	}
+
+	/* Allocate a local buffer - this is much faster than doing N GrArea calls */
+	dst = local = (char *) malloc( (drect->width * size) * drect->height);
+
+	if (!local) return;
+
+	/* Copy each row to the buffer */
+
+	for(r = 0; r < drect->height; r++) {
+		memcpy(dst, ptr, drect->width * size); 
+		dst += (drect->width * size);
+
+		ptr += (srect->width - srect->x) * size;  /* Move to the end of the line on the real buffer */
+		ptr += (srect->x * size);              /* And then offset ourselves accordingly          */
+	}
+	       
+	GrArea(d, gc, drect->x, drect->y, drect->width, drect->height, local, mode);
+	free(local);
+}
+
 static int
 putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 	int src_x, int src_y, int dest_x, int dest_y,
@@ -298,16 +346,16 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 	int mode = MWPF_PIXELVAL;
 	unsigned char *src = image->data;
 
-printf("putTrueColorImage depth %d  src %d,%d wxh %d,%d dst %d,%d\n",
-	image->depth, src_x, src_y, width, height, dest_x, dest_y);
+#ifdef DEBUG
+	printf("putTrueColorImage depth %d  src %d,%d wxh %d,%d dst %d,%d\n",
+	       image->depth, src_x, src_y, width, height, dest_x, dest_y);
+#endif
 
-// FIXME, may not work with nonzero src_x/y
-	/* Just GrArea the entire image without modification */
 	switch (image->bits_per_pixel) {
 	case 1:	// major FIXME
 		printf("putTruecolorImage bpp 1 FIXME\n");
 		src = image->data;
-return 1; // must return, will crash server
+		return 1; // must return, will crash server
 		break;
 	case 8:
 		mode = MWPF_TRUECOLOR332;
@@ -331,21 +379,29 @@ return 1; // must return, will crash server
 	default:
 		printf("XPutImage: unsupported bpp %d\n", image->bits_per_pixel);
 	}
-printf("putTrueColorImage nxmode = %d\n", mode);
-#if 0000
-if (mode == MWPF_TRUECOLOR555 || mode == MWPF_TRUECOLOR565) {
-	unsigned short *s;
-	int x, y;
-	for (y=0; y<height; ++y) {
-		s = (unsigned short *)(src + y*image->bytes_per_line);
-		for (x=0; x<width; ++x)
-			printf("%04x ", *s++);
-		printf("\n");
-	}
-}
+
+#ifdef DEBUG
+	printf("putTrueColorImage nxmode = %d\n", mode);
 #endif
-	GrArea((GR_WINDOW_ID)d, (GR_GC_ID)gc->gid, dest_x, dest_y,
-	       width, height, src, mode);
+
+	/* We can only do a direct GrArea if the width is the same as the width
+	   of our image buffer.  Otherwise, we need to move to a slower path that
+	   handles the situation better.
+	*/
+
+	if (!src_x && width == image->width) 
+		GrArea((GR_WINDOW_ID)d, (GR_GC_ID)gc->gid, dest_x, dest_y,
+		       width, height, src, mode);
+	else {
+		GR_RECT srect, drect;
+		srect.x = src_x;  srect.y = src_y;
+		srect.width = image->width;  srect.height = image->height;
+		
+		drect.x = dest_x;  drect.y = dest_y;
+		drect.width = width;  drect.height = height;
+		
+		showPartialImage((GR_WINDOW_ID) d, (GR_GC_ID) gc->gid, &srect, &drect, src, mode);
+	}
 
 	return 1;
 }
@@ -429,11 +485,9 @@ printf("putImage: bpp %d\n", image->depth);
 
 int
 XPutImage(Display * display, Drawable d, GC gc, XImage * image,
-	  int src_x, int src_y, int dest_x, int dest_y, unsigned int width,
-	  unsigned int height)
+	int src_x, int src_y, int dest_x, int dest_y, unsigned int width,
+	unsigned int height)
 {
-printf("XPutImage depth %d\n", image->depth);
-
 	// FIXME bpp 1
 	if (XDefaultVisual(display, 0)->class == TrueColor && image->depth != 1)
 		return putTrueColorImage(display, d, gc, image, src_x, src_y,

@@ -1,6 +1,6 @@
 #include "nxlib.h"
 #include <stdlib.h>
-#include <X11/Xutil.h>	/* typedef struct _XRegion *Region */
+#include "Xutil.h"	/* typedef struct _XRegion *Region */
 
 /*
  * X11 -> Nano-X Region routines

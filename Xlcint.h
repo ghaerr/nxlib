@@ -68,9 +68,9 @@ from The Open Group.
 #ifndef	_XLCINT_H_
 #define	_XLCINT_H_
 
-#include <X11/Xresource.h>
-#include <X11/Xutil.h>
-//#include "Xvarargs.h"
+#include "Xresource.h"
+#include "Xutil.h"
+/*#include "Xvarargs.h"*/
 #include "varargs.h"
 
 typedef Bool (*XFilterEventProc)(

@@ -4,7 +4,7 @@
 # note: if build fails, rebuild keysymstr.h by "make distclean",
 #       then "make"
 #
-# 13 Aug 2002
+# 11 Aug 2003
 #
 
 # set to Microwindows and X11 include and lib directories
@@ -13,7 +13,6 @@ X11=/usr/X11R6
 
 MWIN_INCLUDE=$(MWIN)/include
 MWIN_LIB=$(MWIN)/lib
-X11_INCLUDE=$(X11)/include
 X11_LIB=$(X11)/lib
 
 # set to font PCF file search directories, rgb.txt file location
@@ -26,7 +25,6 @@ SHAREDLIB=Y
 LIBNAME = X11
 xSOLIBREV = 6.1
 SOLIBREV = 6.2
-CFLAGS += -DXCONST=_Xconst
 
 # set to Y to include (unmodifed X11) Xrm routines
 INCLUDE_XRM=Y
@@ -41,7 +39,7 @@ LN = ln -s
 MV = mv
 RM = rm -f
 DEBUG = -g
-CFLAGS += -Wall $(DEBUG) -I$(X11_INCLUDE) -I$(MWIN_INCLUDE)
+CFLAGS += -Wall $(DEBUG) -I$(MWIN_INCLUDE)
 CFLAGS += -DX11_FONT_DIR1=\"$(X11_FONT_DIR1)\"
 CFLAGS += -DX11_FONT_DIR2=\"$(X11_FONT_DIR2)\"
 CFLAGS += -DX11_RGBTXT=\"$(X11_RGBTXT)\"

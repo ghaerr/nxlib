@@ -137,3 +137,16 @@ printf("XLoadFont('%s') = '%s' [%d]\n", name, fontname, font);
 		Xfree(fontname);
 	return font;
 }
+
+/* Stub out XCreateFontSet - but return the right values so we don't 
+   freak out GTK 
+*/
+XFontSet
+XCreateFontSet(Display *display, _Xconst char *base_font_name_list, 
+	char ***missing_charset_list_return, int *missing_charset_count_return,
+	char **def_string_return)
+{
+	*missing_charset_list_return = NULL;
+	*missing_charset_count_return = 0;
+	return NULL;
+}

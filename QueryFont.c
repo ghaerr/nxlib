@@ -1,5 +1,5 @@
 #include "nxlib.h"
-#include <X11/Xatom.h>
+#include "Xatom.h"
 
 XFontStruct *
 XLoadQueryFont(Display * dpy, _Xconst char *name)

@@ -11,13 +11,13 @@
 
 /* deal with _Xconst differences in X11 header files*/
 #ifndef XCONST
-#define XCONST
+#define XCONST	_Xconst
 #endif
 
 /*
  * bet you never thought you'd see both of these in the same file ;-)
  */
-#include <X11/Xlib.h>
+#include "Xlib.h"
 #include <nano-X.h>
 
 #include <stdio.h>
