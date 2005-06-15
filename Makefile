@@ -60,7 +60,8 @@ OBJS = DestWind.o MapWindow.o NextEvent.o OpenDis.o ClDisplay.o\
 	ListPix.o GetGeom.o SetIFocus.o Shape.o\
 	font.o Free.o stub.o\
 	ClassHint.o Text16.o ListFonts.o QueryFont.o TextExt.o SetFontPath.o\
-	AllocColor.o ParseColor.o QueryColor.o Colormap.o Colorname.o
+	AllocColor.o ParseColor.o QueryColor.o Colormap.o Colorname.o\
+	Selection.o
 
 ifeq ($(INCLUDE_XRM), Y)
 OBJS += Quarks.o Xrm.o

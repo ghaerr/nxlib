@@ -2,7 +2,7 @@
 
 #include "nxlib.h"
 
-/* Het another dummy storage area.  We hold onto the value and
+/* Yet another dummy storage area.  We hold onto the value and
    return them when XGetSelectionOwner says so
 
    It seems that selections live forever - I don't see any way to
@@ -18,51 +18,62 @@ struct sstruct {
 
 static struct sstruct *select_list = 0;
 
-int XSetSelectionOwner(Display *display, Atom selection, Window owner, Time t) {
-	
+int
+XSetSelectionOwner(Display *display, Atom selection, Window owner, Time t)
+{
 	struct sstruct *select = select_list;
 	struct sstruct *prev = 0;
 	
-	for( ; select; prev = select, select = select->next) 
+	for( ; select; prev = select, select = select->next) {
 		if (select->selection == selection) {
 			if (t > select->time) { 
-				select->owner = owner;   /* Note:  SelectionClear event should get generated here */
+				/* Note:  SelectionClear event should get generated here */
+				select->owner = owner;
 				select->time = (t == CurrentTime) ? time(0) : t;
 			}
-			
 			return 0;
 		}
-	
+	}
 	select = (struct sstruct *) malloc(sizeof(struct sstruct));
 	select->selection = selection;
 	select->owner = owner;
-	select->time = (t == CurrentTime) ? time(0) : t;
+	select->time = (t == CurrentTime)? time(0) : t;
 	select->next = 0;
 
-	if (!prev) select_list = select;
+	if (!prev)
+		select_list = select;
 	else prev->next = select;
 
 	return 0;
 }
 
-static struct sstruct *find_selection(Atom selection) {
+static struct sstruct *
+find_selection(Atom selection)
+{
 	struct sstruct *select = select_list;
 	
 	for (; select; select = select->next) 
-		if (select->selection == selection) return select;
+		if (select->selection == selection)
+			return select;
 	return 0;
 }
 
-Window XGetSelectionOwner(Display *display, Atom selection) {
+Window
+XGetSelectionOwner(Display *display, Atom selection)
+{
 	struct sstruct *select = find_selection(selection);
-	return (select) ? select->owner : None;
+
+	return (select)? select->owner : None;
 }
 
-/* Move selection to target.  There are lots of events that might be generated here, but for now we won't
-   worry about those. 
-*/
-
-int XConvertSelection(Display *display, Atom selection, Atom target, Atom property, Window requestor, Time t) {
+/* 
+ * Move selection to target.  There are lots of events that might be
+ * generated here, but for now we won't worry about those. 
+ */
+int
+XConvertSelection(Display *display, Atom selection, Atom target, Atom property,
+	Window requestor, Time t)
+{
 	struct sstruct *select = find_selection(selection);
 	
 	select->selection = target;
@@ -72,10 +83,5 @@ int XConvertSelection(Display *display, Atom selection, Atom target, Atom proper
 	   situation, or if there is no owner, then a SelectionNotify 
 	   to the requestor 
 	*/
-
 	return 0;
 }
-
-		
-	
-	
