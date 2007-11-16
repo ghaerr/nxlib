@@ -8,7 +8,7 @@ int XSetState() { printf("XSetState called\n"); return 0; }
 int XResourceManagerString() { printf("XResourceManagerString called\n"); return 0; } 
 int XrmParseCommand() { printf("XrmParseCommand called\n"); return 0; } 
 int XQueryKeymap() { printf("XQueryKeymap called\n"); return 0; } 
-int XGetDefault() { printf("XGetDefault called\n"); return 0; } 
+int XGetDefault(void *d, char *program, char *option) { printf("XGetDefault %s %s\n", program, option); return 0; } 
 int XRecolorCursor() { printf("XRecolorCursor called\n"); return 0; } 
 
 /* stubbed out calls, need implementations*/

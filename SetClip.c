@@ -16,11 +16,11 @@ XSetClipMask(Display *display, GC gc, Pixmap mask)
 	static GR_GC_ID	last_gc = 0;
 	static GR_REGION_ID last_region = 0;
 
-printf("XSetClipMask %d\n", (int)mask);
 	if (mask == None) {
 		GrSetGCRegion(gc->gid, 0);
 		return 1;
 	}
+printf("XSetClipMask %d\n", (int)mask);
 
 	/* avoid memory leak by deleting last region before new alloc*/
 	if (last_gc == gc->gid && last_region != 0) {
