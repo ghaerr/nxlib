@@ -17,8 +17,9 @@ XDrawRectangles(Display *display, Drawable d, GC gc, XRectangle *rect,
 
 	for (i = 0; i < nrect; i++) {
 		/* X11 width/height is one less than Nano-X width/height*/
-		GrRect(d, gc->gid, rect[i].x, rect[i].y, rect[i].width+1,
-		       rect[i].height+1);
+		GrRect(d, gc->gid, rect->x, rect->y, rect->width+1,
+		       rect->height+1);
+		++rect;
 	}
 	return 1;
 }

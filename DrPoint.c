@@ -15,8 +15,10 @@ XDrawPoints(Display * display, Drawable d, GC gc,
 	int i;
 
 	if (mode == CoordModeOrigin) {
-		for (i = 0; i < npoints; i++)
+		for (i = 0; i < npoints; i++) {
 			GrPoint(d, gc->gid, points->x, points->y);
+			++points;
+		}
 	} else {
 		int prevx = 0, prevy = 0;
 
@@ -25,6 +27,7 @@ XDrawPoints(Display * display, Drawable d, GC gc,
 				prevy + points->y);
 			prevx += points->x;
 			prevy += points->y;
+			++points;
 		}
 	}
 

@@ -11,31 +11,23 @@ XSetClipOrigin(Display *display, GC gc, int clip_x_origin, int clip_y_origin)
 int
 XSetClipMask(Display *display, GC gc, Pixmap mask)
 {
-	GR_REGION_ID	r;
+	XGCValues *vp = (XGCValues *)gc->ext_data;
 	GR_WINDOW_INFO	info;
-	static GR_GC_ID	last_gc = 0;
-	static GR_REGION_ID last_region = 0;
+
+	/* avoid memory leak by deleting current gc region before new alloc*/
+	if (vp->clip_mask != None)
+		GrDestroyRegion(vp->clip_mask);
 
 	if (mask == None) {
 		GrSetGCRegion(gc->gid, 0);
+		vp->clip_mask = None;
 		return 1;
-	}
-printf("XSetClipMask %d\n", (int)mask);
-
-	/* avoid memory leak by deleting last region before new alloc*/
-	if (last_gc == gc->gid && last_region != 0) {
-		/* FIXME should keep last region in GC struct private data*/
-		GrDestroyRegion(last_region);
-		last_region = 0;
 	}
 
 	GrGetWindowInfo(mask, &info);
-	r = GrNewRegionFromPixmap(mask, 0, 0, info.width, info.height);
-	GrSetGCRegion(gc->gid, r);
+	vp->clip_mask = GrNewRegionFromPixmap(mask, 0, 0, info.width, info.height);
+	GrSetGCRegion(gc->gid, vp->clip_mask);
 
-	last_gc = gc->gid;
-	last_region = r;
-	/*GrDestroyRegion(r);*/		/* can't destroy region here...*/
 	return 1;
 }
 
@@ -44,22 +36,19 @@ XSetClipRectangles(Display *display, GC gc, int clip_x_origin, int clip_y_origin
 	XRectangle *rectangles, int n, int ordering)
 {
 	GR_REGION_ID	r;
-	static GR_GC_ID	last_gc = 0;
-	static GR_REGION_ID last_region = 0;
+	XGCValues *vp = (XGCValues *)gc->ext_data;
 
 	GrSetGCClipOrigin(gc->gid, clip_x_origin, clip_y_origin);
+
+	/* avoid memory leak by deleting current gc region before new alloc*/
+	if (vp->clip_mask != None)
+		GrDestroyRegion(vp->clip_mask);
 
 	if (n == 0) {
 		/* FIXME need to disable all output here...*/
 		printf("XSetClipRectangles called with n=0\n");
+		vp->clip_mask = None;	/* None for no output?*/
 		return 1;
-	}
-
-	/* avoid memory leak by deleting last region before new alloc*/
-	if (last_gc == gc->gid && last_region != 0) {
-		/* FIXME should keep last region in GC struct private data*/
-		GrDestroyRegion(last_region);
-		last_region = 0;
 	}
 
 	r = GrNewRegion();
@@ -74,9 +63,7 @@ XSetClipRectangles(Display *display, GC gc, int clip_x_origin, int clip_y_origin
 		++rectangles;
 	}
 	GrSetGCRegion(gc->gid, r);
+	vp->clip_mask = r;
 
-	last_gc = gc->gid;
-	last_region = r;
-	/*GrDestroyRegion(r);*/		/* can't destroy region here...*/
 	return 1;
 }

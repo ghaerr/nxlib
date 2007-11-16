@@ -20,6 +20,9 @@ X11_FONT_DIR1=/usr/lib/X11/fonts/100dpi
 X11_FONT_DIR2=/usr/lib/X11/fonts/misc
 X11_RGBTXT=/usr/lib/X11/rgb.txt
 
+# set to Y for big endian architecture (should be automatic)
+BIGENDIAN=N
+
 # set to Y to make shared X11 libs
 SHAREDLIB=Y
 LIBNAME = X11
@@ -74,6 +77,10 @@ CFLAGS += -I.
 endif
 
 LIBS = libnx11.a
+
+ifeq ($(BIGENDIAN), Y)
+CFLAGS += -DCPU_BIG_ENDIAN=1
+endif
 
 ifeq ($(SHAREDLIB), Y)
 CFLAGS += -fPIC

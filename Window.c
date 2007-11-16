@@ -22,15 +22,18 @@ XCreateWindow(Display *dpy, Window parent, int x, int y,
 	if (parent == 0)
 		parent = GR_ROOT_WINDOW_ID;
 
-	if (valuemask & CWBackPixel)
-		bkgnd = _nxColorvalFromPixelval(dpy, attributes->background_pixel);
+	if (class == InputOnly)
+		wid = GrNewInputWindow((GR_WINDOW_ID)parent, x, y, width, height);
+	else {
+		if (valuemask & CWBackPixel)
+			bkgnd = _nxColorvalFromPixelval(dpy, attributes->background_pixel);
 
-	if (valuemask & CWBorderPixel)
-		border = _nxColorvalFromPixelval(dpy, attributes->border_pixel);
+		if (valuemask & CWBorderPixel)
+			border = _nxColorvalFromPixelval(dpy, attributes->border_pixel);
 
-	wid = GrNewWindow((GR_WINDOW_ID)parent, x, y, width, height, borderWidth,
-		bkgnd, border);
-
+		wid = GrNewWindow((GR_WINDOW_ID)parent, x, y, width, height, borderWidth,
+			bkgnd, border);
+	}
 	if (!wid)
 		return 0;
 
@@ -44,8 +47,10 @@ XCreateWindow(Display *dpy, Window parent, int x, int y,
 	}
 
 	if (valuemask & CWEventMask)
-		XSelectInput( dpy, wid, attributes->event_mask);
+		XSelectInput(dpy, wid, attributes->event_mask);
 
+	if (valuemask & CWCursor)
+		XDefineCursor(dpy, wid, attributes->cursor);
 
     // FIXME add XCreateWindow valuemask attributes
     //if (valuemask & CWBackPixmap)
@@ -68,8 +73,6 @@ XCreateWindow(Display *dpy, Window parent, int x, int y,
 	//*value++ = attributes->do_not_propagate_mask;
     //if (valuemask & CWColormap)
 	//*value++ = attributes->colormap;
-    //if (valuemask & CWCursor)
-	//*value++ = attributes->cursor;
 
 	return wid;
 }

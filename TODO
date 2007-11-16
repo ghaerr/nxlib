@@ -1,5 +1,3 @@
-XSetClipMask creates a region leak - GrDestroyGC doesn't deallocate resources
-	temp fixed for single GCs, needs to keep region in GC struct private data
 clipping on oval windows on fltk forms
 width/height vs radius in Arc draws buggy for all even widths
 	fltk valuators dial problems, arc/fill borders incorrect

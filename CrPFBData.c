@@ -40,10 +40,16 @@ XCreatePixmapFromBitmapData(Display *display, Drawable d, char *data,
 		fc = _nxColorvalFromPixelval(display, fg);
 		bc = _nxColorvalFromPixelval(display, bg);
 	}
-printf("XCreatePixmapFromBitmapData %x,%x\n", fc, bc);
+printf("XCreatePixmapFromBitmapData %x,%x\n", (int)fc, (int)bc);
 
-	return GrNewPixmapFromData(width, height, fc, bc,
-		(void *)data, GR_BMDATA_BYTEREVERSE|GR_BMDATA_BYTESWAP);
+#if CPU_BIG_ENDIAN
+	return GrNewPixmapFromData(width, height, fc, bc, (void *)data,
+		GR_BMDATA_BYTEREVERSE);
+#else
+	return GrNewPixmapFromData(width, height, fc, bc, (void *)data,
+		GR_BMDATA_BYTEREVERSE|GR_BMDATA_BYTESWAP);
+#endif
+
 #if 0
     XImage ximage;
     GC gc;

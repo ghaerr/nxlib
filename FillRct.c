@@ -14,9 +14,11 @@ int
 XFillRectangles(Display *dpy, Drawable d, GC gc, XRectangle *rects, int nrects) {
 	int i;
 
-	for(i = 0; i < nrects; i++) 
-		XFillRectangle(dpy, d, gc, rects[i].x, rects[i].y,
-				rects[i].width, rects[i].height);
+	for(i = 0; i < nrects; i++) {
+		XFillRectangle(dpy, d, gc, rects->x, rects->y,
+				rects->width, rects->height);
+		++rects;
+	}
 
 	return 1;
 }

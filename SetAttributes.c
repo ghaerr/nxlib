@@ -4,7 +4,7 @@ int
 XChangeWindowAttributes(Display * display, Window w, unsigned long valuemask,
 			XSetWindowAttributes * attributes)
 {
-printf("XChangeWindowAttributes: valuemask 0x%X\n", valuemask);
+printf("XChangeWindowAttributes: valuemask 0x%X\n", (int)valuemask);
 
 	if (valuemask & CWBackPixel)
 		XSetWindowBackground(display, w, attributes->background_pixel);

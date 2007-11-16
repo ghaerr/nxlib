@@ -78,9 +78,10 @@ XDrawArcs(Display *display, Drawable d, GC gc, XArc *arcs, int narcs)
 
 	for (i = 0; i < narcs; i++) {
 		/* X11 width/height is one less than Nano-X width/height*/
-		drawArc(d, gc, arcs[i].x, arcs[i].y,
-			arcs[i].width+1, arcs[i].height+1, arcs[i].angle1,
-			arcs[i].angle2, GR_ARC);
+		drawArc(d, gc, arcs->x, arcs->y,
+			arcs->width+1, arcs->height+1, arcs->angle1,
+			arcs->angle2, GR_ARC);
+		++arcs;
 	}
 	return 1;
 }
@@ -98,8 +99,10 @@ XFillArcs(Display *display, Drawable d, GC gc, XArc *arcs, int narcs)
 {
 	int i;
 
-	for (i = 0; i < narcs; i++)
-		drawArc(d, gc, arcs[i].x, arcs[i].y, arcs[i].width,
-			arcs[i].height, arcs[i].angle1, arcs[i].angle2, GR_PIE);
+	for (i = 0; i < narcs; i++) {
+		drawArc(d, gc, arcs->x, arcs->y, arcs->width,
+			arcs->height, arcs->angle1, arcs->angle2, GR_PIE);
+		++arcs;
+	}
 	return 1;
 }

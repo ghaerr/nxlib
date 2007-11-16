@@ -21,10 +21,17 @@ Pixmap
 XCreateBitmapFromData(Display *display, Drawable d, _Xconst char *data,
 	unsigned int width, unsigned int height)
 {
-	// FIXME use XImages
+#if CPU_BIG_ENDIAN
+	return GrNewPixmapFromData(width, height, GR_RGB(255,255,255),
+		GR_RGB(0, 0, 0),(void *)data,
+		GR_BMDATA_BYTEREVERSE);
+#else
 	return GrNewPixmapFromData(width, height, GR_RGB(255,255,255),
 		GR_RGB(0, 0, 0),(void *)data,
 		GR_BMDATA_BYTEREVERSE|GR_BMDATA_BYTESWAP);
+#endif
+
+// FIXME use XImages
 #if 0
     XImage ximage;
     GC gc;
