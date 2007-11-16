@@ -8,7 +8,7 @@
 #
 
 # set to Microwindows and X11 include and lib directories
-MWIN=/usr2/microwin/src
+MWIN=/home/greg/net/microwin/src
 X11=/usr/X11R6
 
 MWIN_INCLUDE=$(MWIN)/include

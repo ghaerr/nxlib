@@ -1,12 +1,14 @@
 #include <string.h>
 #include "nxlib.h"
 
+#define SZHASHTABLE	32
 struct window_props {
 	Atom property;
 	Atom type;
 	int format;
 	unsigned char *data;
-	int count;
+	int nelements;
+	int bytes;
 	struct window_props *next;
 };
 
@@ -15,84 +17,89 @@ struct windows {
 	struct window_props *properties;
 	struct windows *next;
 };
-static struct windows *window_list[32];
+static struct windows *window_list[SZHASHTABLE];
 
-static int
-_nxAddProperty(Window w, Atom property, Atom type, int format, int mode,
-	       const unsigned char *data, int nelements)
+int
+XChangeProperty(Display * display, Window w, Atom property,
+		Atom type, int format, int mode,
+		_Xconst unsigned char *data, int nelements)
 {
-	int hash = w % 32;
-	struct windows *win = 0;
-	struct window_props *prop = 0;
+	struct windows *win = NULL;
+	struct window_props *prop = NULL;
+	int hash = w % SZHASHTABLE;
 
-	if (!window_list[hash]) {
+	win = window_list[hash];
+	if (!win) {
 		win = window_list[hash] =
 			(struct windows *) Xcalloc(sizeof(struct windows), 1);
 	} else {
-		struct windows *t = window_list[hash];
-		while (t->next) {
+		struct windows *t;
+
+		for (t=win; ; t=t->next) {
 			if (t->w == w) {
 				win = t;
 				break;
 			}
-
-			t = t->next;
+			if (!t->next)
+				break;
 		}
 
-		if (!win)
+		if (!win) {
 			win = t->next =
 				(struct windows *) Xcalloc(sizeof(struct windows), 1);
+		}
 	}
+	win->w = w;
 
-	if (!win->properties)
+	if (!win->properties) {
 		prop = win->properties =
 			(struct window_props *) Xcalloc(sizeof(struct window_props), 1);
-	else {
-		struct window_props *t = win->properties;
-		while (t->next) {
+	} else {
+		struct window_props *t;
+
+		for (t=win->properties; ; t=t->next) {
 			if (t->property == property) {
 				prop = t;
 				break;
 			}
-
-			t = t->next;
+			if (!t->next)
+				break;
 		}
 
-		if (!prop)
+		if (!prop) {
 			prop = t->next =
 				(struct window_props *) Xcalloc(sizeof(struct window_props), 1);
+		}
 	}
 
 	switch (mode) {
 	case PropModeAppend:
 	case PropModePrepend:
 		if (prop->data) {
-			char *n;
+			int f8 = prop->format / 8;
+			char *p;
+			int bytes;
 
 			if (type != prop->type || format != prop->format)
-				return (0);
+				return 0;
 
-			n = (char *) Xmalloc((prop->count + nelements) *
-					    (prop->format / 8));
+			bytes = (prop->nelements + nelements) * f8;
+			p = (char *) Xmalloc(bytes);
 
 			if (mode == PropModeAppend) {
-				memcpy(n, prop->data,
-				       prop->count * (prop->format / 8));
-				memcpy(n + (prop->count * (prop->format / 8)),
-				       data,
-				       (nelements * (prop->format / 8)));
+				memcpy(p, prop->data, prop->nelements * f8);
+				memcpy(p + (prop->nelements * f8), data,
+				       (nelements * f8));
 			} else {
-				memcpy(n, data,
-				       nelements * (prop->format / 8));
-				memcpy(n + (nelements * (prop->format / 8)),
-				       prop->data,
-				       (prop->count * (prop->format / 8)));
+				memcpy(p, data, nelements * f8);
+				memcpy(p + (nelements * f8), prop->data,
+				       (prop->nelements * f8));
 			}
 
 			Xfree(prop->data);
-			prop->data = n;
-
-			prop->count = prop->count + nelements;
+			prop->data = p;
+			prop->nelements += nelements;
+			prop->bytes = bytes;
 			break;
 		}
 		/* Fall through */
@@ -100,32 +107,30 @@ _nxAddProperty(Window w, Atom property, Atom type, int format, int mode,
 	case PropModeReplace:
 		if (prop->data)
 			Xfree(prop->data);
-		prop->data = (char *) Xmalloc(nelements * (format / 8));
-		memcpy(prop->data, data, (nelements * (format / 8)));
+		prop->bytes = nelements * (format / 8);
+		prop->data = (char *) Xmalloc(prop->bytes);
+		memcpy(prop->data, data, prop->bytes);
 
 		prop->property = property;
 		prop->type = type;
 		prop->format = format;
-		prop->count = nelements;
-
+		prop->nelements = nelements;
 		break;
 	}
 
 	return 1;
 }
 
-static int
-_nxDelProperty(Window w, Atom property)
+int
+XDeleteProperty(Display *display, Window w, Atom property)
 {
-
-	int hash = (w % 32);
-
 	struct windows *win;
 	struct window_props *prop;
+	int hash = w % SZHASHTABLE;
 
 	for (win = window_list[hash]; win; win = win->next)
 		if (win->w == w) {
-			struct window_props *prev = 0;
+			struct window_props *prev = NULL;
 
 			for (prop = win->properties; prop; prop = prop->next)
 				if (prop->property == property) {
@@ -137,7 +142,10 @@ _nxDelProperty(Window w, Atom property)
 					if (prop->data)
 						Xfree(prop->data);
 					Xfree(prop);
-					return (1);
+
+					if (win == window_list[hash])
+						window_list[hash] = NULL;
+					return 1;
 				}
 		}
 
@@ -147,17 +155,16 @@ _nxDelProperty(Window w, Atom property)
 int
 _nxDelAllProperty(Window w)
 {
-
-	int hash = (w % 32);
-
 	struct windows *win;
 	struct window_props *prop;
+	int hash = w % SZHASHTABLE;
 
 	for (win = window_list[hash]; win; win = win->next)
 		if (win->w == w) {
 			prop = win->properties;
 			while (prop) {
 				struct window_props *next = prop->next;
+
 				if (prop->data)
 					Xfree(prop->data);
 				Xfree(prop);
@@ -165,24 +172,42 @@ _nxDelAllProperty(Window w)
 			}
 
 			Xfree(win);
+
+			if (win == window_list[hash])
+				window_list[hash] = NULL;
 			return 1;
 		}
-
 	return 1;
 }
 
 int
-XChangeProperty(Display * display, Window w, Atom property,
-		Atom type, int format, int mode,
-		_Xconst unsigned char *data, int nelements)
+XGetWindowProperty(Display * dpy, Window w, Atom property, long offset,
+	long len, Bool bDel, Atom req, Atom * type, int *format,
+	unsigned long *nitems, unsigned long *bytes, unsigned char **data)
 {
-printf("XChangeProperty %s\n", XGetAtomName(display, property));
-	return _nxAddProperty(w, property, type, format, mode,
-			       data, nelements);
+	struct windows *win;
+	struct window_props *prop;
+	int hash = w % SZHASHTABLE;
+
+	for (win = window_list[hash]; win; win = win->next) {
+		if (win->w == w) {
+			for (prop = win->properties; prop; prop = prop->next) {
+				if (prop->property == property) {
+					*type = prop->type;
+					*format = prop->format;
+					*data = prop->data;
+					*nitems = prop->nelements;
+					*bytes = prop->bytes;
+					return 0;
+				}
+			}
+		}
+	}
+	*type = None;
+	*format = 0;
+	*data = 0;
+	*nitems = 0;
+	*bytes = 0;
+	return 1;		/* failure */
 }
 
-int
-XDeleteProperty(Display * display, Window w, Atom property)
-{
-	return _nxDelProperty(w, property);
-}

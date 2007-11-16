@@ -1,5 +1,8 @@
 #include <string.h>
+#include "Xatom.h"
 #include "nxlib.h"
+
+#define SZHASHTABLE	64
 
 struct hash_t {
 	char *name;
@@ -7,8 +10,8 @@ struct hash_t {
 	struct hash_t *next;
 };
 
-static struct hash_t *hash_list[64];
-static unsigned long atom_id = 1;
+static struct hash_t *hash_list[SZHASHTABLE];
+static unsigned long atom_id = XA_LAST_PREDEFINED + 32;
 
 static unsigned char
 hash_str(_Xconst char *name)
@@ -19,19 +22,19 @@ hash_str(_Xconst char *name)
 	for (i = 0; i < strlen(name); i++)
 		ch += name[i];
 
-	return (ch % 64);
+	return (ch % SZHASHTABLE);
 }
 
 Atom
 XInternAtom(Display * display, _Xconst char *atom_name, Bool only_if_exists)
 {
 	unsigned char hash = hash_str(atom_name);
-	struct hash_t *val = hash_list[hash];
+	struct hash_t *val;
 
-printf("XInternAtom %s %d\n", atom_name, only_if_exists);
 	for (val = hash_list[hash]; val; val = val->next)
-		if (strcmp(val->name, atom_name) == 0)
+		if (strcmp(val->name, atom_name) == 0) {
 			return val->atom;
+		}
 
 	if (only_if_exists == True)
 		return None;
@@ -49,7 +52,6 @@ printf("XInternAtom %s %d\n", atom_name, only_if_exists);
 
 	val->name = strdup(atom_name);
 	val->atom = atom_id++;
-
 	return val->atom;
 }
 
@@ -57,7 +59,8 @@ Status
 XInternAtoms(Display * display, char **names, int count,
 	     Bool only_if_exists, Atom * atoms_return)
 {
-	int ret = 1, i = 0;
+	int i;
+	int ret = 1;
 
 	for (i = 0; i < count; i++) {
 		atoms_return[i] =
@@ -69,27 +72,29 @@ XInternAtoms(Display * display, char **names, int count,
 	return ret;
 }
 
+/* return copy of Atom name*/
 char *
 XGetAtomName(Display * display, Atom atom)
 {
-	int i = 0;
+	int i;
 
-	for (i = 0; i < 64; i++) {
-		struct hash_t *val = hash_list[i];
+	for (i = 0; i < SZHASHTABLE; i++) {
+		struct hash_t *val;
+
 		for (val = hash_list[i]; val; val = val->next)
 			if (val->atom == atom) {
-				unsigned char *foo = strdup(val->name);
-				return (foo);
+				unsigned char *name = strdup(val->name);
+				return name;
 			}
 	}
-
-	return 0;
+	return NULL;
 }
 
 Status
 XGetAtomNames(Display * display, Atom * atoms, int count, char **names_return)
 {
-	int ret = 1, i = 0;
+	int i;
+	int ret = 1;
 
 	for (i = 0; i < count; i++) {
 		names_return[i] = XGetAtomName(display, atoms[i]);

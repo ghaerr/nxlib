@@ -1,19 +1,6 @@
 #include <string.h>
 #include "nxlib.h"
 
-int
-XGetWindowProperty(Display * dpy, Window win, Atom prop, long offset,
-	long len, Bool bDel, Atom req, Atom * type, int *format,
-	unsigned long *nitems, unsigned long *bytes, unsigned char **data)
-{
-	*type = None;
-	*format = 0;
-	*data = 0;
-	*nitems = 0;
-	*bytes = 0;
-	return 1;		/* failure */
-}
-
 Status
 XGetWindowAttributes(Display * display, Window w, XWindowAttributes * ret)
 {

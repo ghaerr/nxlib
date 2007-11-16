@@ -1,3 +1,7 @@
+15 November 2007
+	* rewrite XChangeProperty, never worked, implement XGetWindowProperty
+	* fix XInternAtom to return above XA_LAST_PREDEFINED
+14 June 2005
 	* add XSetSelectionOwner,XGetSelectionOwner,XConvertSelection (Jordan)
 Version 0.45 - 11 Sep 2003 - greg@censoft.com
 	* added XAllocWMHints, XAllocSizeHints for FLTK 1.1.4
