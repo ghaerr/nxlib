@@ -1,3 +1,5 @@
+XSetClipMask creates a region leak - GrDestroyGC doesn't deallocate resources
+	temp fixed for single GCs, needs to keep region in GC struct private data
 clipping on oval windows on fltk forms
 width/height vs radius in Arc draws buggy for all even widths
 	fltk valuators dial problems, arc/fill borders incorrect
@@ -66,7 +68,6 @@ change to Query Truecolor or not for display
 think about GrReadArea return size based on MWPF_xxx
 	should it be based on bpp?  no.
 
-XSetClipMask creates a region leak - GrDestroyGC doesn't deallocate resources
 
 is Cursor black/white reversed? (X11 bits reverse meaning?)
 

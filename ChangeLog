@@ -1,4 +1,5 @@
 15 November 2007
+	* temp fix memory leak in XSetClipMask and XSetClipRectangles
 	* rewrite XChangeProperty, never worked, implement XGetWindowProperty
 	* fix XInternAtom to return above XA_LAST_PREDEFINED
 14 June 2005
