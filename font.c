@@ -2,8 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-char **_nxfontlist = 0;
+char **_nxfontlist = NULL;
 int _nxfontcount = 0;
+
+/* default X11 font directory list, add directories if desired*/
+static char *NXDIRLIST[] = {
+	X11_FONT_DIR1,
+	X11_FONT_DIR2,
+	X11_FONT_DIR3,
+	0
+};
 
 FILE *
 _nxLoadFontDir(char *str)
@@ -18,16 +26,35 @@ _nxLoadFontDir(char *str)
 void
 _nxSetDefaultFontDir(void)
 {
+	int ndirs = (sizeof(NXDIRLIST) / sizeof(char *)) - 1;
+
+	_nxFreeFontDir(_nxfontlist);
+
+	_nxSetFontDir(NXDIRLIST, ndirs);
+}
+
+void
+_nxSetFontDir(char **directories, int ndirs)
+{
 	int i;
 
-	if (_nxfontlist) {
-		for (i = 0; i < _nxfontcount; i++)
-			Xfree(_nxfontlist[i]);
-		Xfree(_nxfontlist);
-	}
+	_nxFreeFontDir(_nxfontlist);
 
-	_nxfontlist = (char **) Xcalloc(2, sizeof(char *));
-	_nxfontlist[0] = strdup(X11_FONT_DIR1);
-	_nxfontlist[1] = strdup(X11_FONT_DIR2);
-	_nxfontcount = 2;
+	_nxfontlist = (char **) Xcalloc(ndirs+1, sizeof(char *));
+	for (i = 0; i < ndirs; i++)
+		_nxfontlist[i] = strdup(directories[i]);
+
+	_nxfontcount = ndirs;
+}
+
+void
+_nxFreeFontDir(char **list)
+{
+	int i;
+
+	if (list) {
+		for (i = 0; list[i]; i++)
+			free(list[i]);
+		Xfree(list);
+	}
 }

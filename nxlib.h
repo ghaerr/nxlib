@@ -88,10 +88,7 @@ extern char **_nxfontlist;
 extern int _nxfontcount;
 FILE * _nxLoadFontDir(char *str);
 void _nxSetDefaultFontDir(void);
-
-/* SetFontPath.c*/
 void _nxSetFontDir(char **directories, int ndirs);
-char** _nxGetFontDir(int *count);
 void _nxFreeFontDir(char **list);
 
 /* LoadFont.c*/

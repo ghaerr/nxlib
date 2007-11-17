@@ -1,6 +1,7 @@
 /* Copyright 2003, Jordan Crouse (jordan@cosmicpenguin.net) */
 
 #include "nxlib.h"
+#include <time.h>
 
 /* Yet another dummy storage area.  We hold onto the value and
    return them when XGetSelectionOwner says so
@@ -13,7 +14,7 @@ struct sstruct {
 	Atom selection;
 	Window owner;
 	Time time;
-	struct ssstruct *next;
+	struct sstruct *next;
 };
 
 static struct sstruct *select_list = 0;
@@ -34,7 +35,7 @@ XSetSelectionOwner(Display *display, Atom selection, Window owner, Time t)
 			return 0;
 		}
 	}
-	select = (struct sstruct *) malloc(sizeof(struct sstruct));
+	select = (struct sstruct *)Xmalloc(sizeof(struct sstruct));
 	select->selection = selection;
 	select->owner = owner;
 	select->time = (t == CurrentTime)? time(0) : t;

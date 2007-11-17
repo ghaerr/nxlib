@@ -52,7 +52,7 @@ int
 XDestroyRegion(Region r)
 {
 	GrDestroyRegion(r->rid);
-	XFree(r);
+	Xfree(r);
 
 	return 1;
 }

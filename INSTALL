@@ -1,15 +1,18 @@
 NXLIB build and installation instructions
-Version 0.44, May 30, 2003
+Version 0.46, November 17, 2007
 
 1. Modify Makefile to set Microwindows and X11 include and lib directories
-	MWIN=/usr2/microwin/src
+	MWIN=/pathto/microwin/src
 	X11=/usr/X11R6
 
 	Microwindows v0.90 or later must be used.
 
-2. Modify Makefile to set X11 PCF font search directories (2)
+2. Modify Makefile to set X11 PCF and Truetype font search directories
 	X11_FONT_DIR1=/usr/lib/X11/fonts/100dpi
 	X11_FONT_DIR2=/usr/lib/X11/fonts/misc
+	X11_FONT_DIR3=/usr/lib/X11/fonts/TTF
+
+	More fonts directories can be added in font.c
 
 3. Modify Makefile to set rgb.txt file location
 	X11_RGBTXT=/usr/lib/X11/rgb.txt

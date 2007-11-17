@@ -4,7 +4,7 @@
 # note: if build fails, rebuild keysymstr.h by "make distclean",
 #       then "make"
 #
-# 11 Aug 2003
+# 17 November 2007
 #
 
 # set to Microwindows and X11 include and lib directories
@@ -18,6 +18,7 @@ X11_LIB=$(X11)/lib
 # set to font PCF file search directories, rgb.txt file location
 X11_FONT_DIR1=/usr/lib/X11/fonts/100dpi
 X11_FONT_DIR2=/usr/lib/X11/fonts/misc
+X11_FONT_DIR3=/usr/lib/X11/fonts/TTF
 X11_RGBTXT=/usr/lib/X11/rgb.txt
 
 # set to Y for big endian architecture (should be automatic)
@@ -45,6 +46,7 @@ DEBUG = -g
 CFLAGS += -Wall $(DEBUG) -I$(MWIN_INCLUDE)
 CFLAGS += -DX11_FONT_DIR1=\"$(X11_FONT_DIR1)\"
 CFLAGS += -DX11_FONT_DIR2=\"$(X11_FONT_DIR2)\"
+CFLAGS += -DX11_FONT_DIR3=\"$(X11_FONT_DIR3)\"
 CFLAGS += -DX11_RGBTXT=\"$(X11_RGBTXT)\"
 xCFLAGS += -O2 -fno-strength-reduce
 
@@ -64,7 +66,7 @@ OBJS = DestWind.o MapWindow.o NextEvent.o OpenDis.o ClDisplay.o\
 	font.o Free.o stub.o\
 	ClassHint.o Text16.o ListFonts.o QueryFont.o TextExt.o SetFontPath.o\
 	AllocColor.o ParseColor.o QueryColor.o Colormap.o Colorname.o\
-	Selection.o
+	Selection.o XMisc.o
 
 ifeq ($(INCLUDE_XRM), Y)
 OBJS += Quarks.o Xrm.o

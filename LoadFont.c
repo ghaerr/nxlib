@@ -1,8 +1,7 @@
 #include "nxlib.h"
+#include "Xatom.h"
 #include <stdlib.h>
 #include <string.h>
-
-#define DEFAULT_PIXEL_SIZE	14	/* default size for scalable fonts*/
 
 static int
 prefix(const char *prestr, char *allstr)
@@ -21,9 +20,6 @@ _nxFindX11Font(const char *xfontname)
 	int fcount, i, f;
 	char *ret;
 	char buffer[128];
-
-	if (!xfontname)
-		return 0;
 
 	if (!_nxfontcount)
 		_nxSetDefaultFontDir();
@@ -111,14 +107,13 @@ any(int c, const char *str)
 Font
 XLoadFont(Display * dpy, _Xconst char *name)
 {
-	GR_FONT_ID	font = 0;
-	char *		fontname;
-	int		defpixelsize = DEFAULT_PIXEL_SIZE;
-	char **		fontlist = NULL;
+	GR_FONT_ID font = 0;
+	char *fontname;
 
-	/* Check for wildcards in font 'name' (the X11 font string). */
+	/* first check for wildcards*/
 	if (any('*', name) || any('?', name)) {
-		int 	count;
+		char **fontlist;
+		int count;
 
 		/* pick first sorted return value for now...*/
 		fontlist = XListFonts(dpy, name, 100000, &count);
@@ -127,49 +122,8 @@ XLoadFont(Display * dpy, _Xconst char *name)
 	} else
 		fontname = (char *)name;
 
-	/* See if 'fontname' is stored in 'X11/fonts.dir' file */
+	/* first try to find from X11/fonts.dir file*/
 	fontname = _nxFindX11Font(fontname);
-
-	/*
-	 * If the font is still not found, then parse again 'name',
-	 * but with a scalable pixel size value ('*').
-  	 */
-	if (fontname == NULL) {
-		int	i;
-		int	dashCounter = 0;
-		int	count;
-		char	*fontName = (char*)Xmalloc(strlen(name));
-		char	*strPtr;
-
-		if (fontName == NULL)
-			return 0;
-
-		strcpy(fontName, name);
-		for (i = 0; i < strlen(fontName); i++) {
-			if (fontName[i] == '-') {
-				dashCounter++;
-				if ( (dashCounter == 6) && (i + 2) <= strlen(fontName) ) {
-					fontName[i + 1] = '*';
-					fontName[i + 2] = '\0';
-				}
-			}
-		}
-
-		/* Search again in 'X11/fonts.dir'. */
-		if (fontlist)
-			XFreeFontNames(fontlist);
-		fontlist = XListFonts(dpy, fontName, 100000, &count);
-		if (fontlist) {
-			fontname = fontlist[0];
-			fontname = _nxFindX11Font(fontname);
-		}
-		Xfree(fontName);
-
-		/* Try to get the requested pixel size for the font. */
-		strPtr = strstr(name, "--");
-		if (strPtr != NULL)
-			sscanf(strPtr, "--%d", &defpixelsize);
-	}
 
 	/* if not found, try 6x13 for "fixed"*/
 	if (!fontname && !strcmp(name, "fixed"))
@@ -177,19 +131,15 @@ XLoadFont(Display * dpy, _Xconst char *name)
 
 	/* found font, load into server*/
 	if (fontname)
-		font = GrCreateFont(fontname, defpixelsize, NULL);
-printf("XLoadFont('%s') = '%s' size %d [%d]\n", name, fontname, defpixelsize, font);
+		font = GrCreateFont(fontname, 0, NULL);
 
+printf("XLoadFont('%s') = '%s' [%d]\n", name, fontname, font);
 	if (fontname)
 		Xfree(fontname);
-	if (fontlist)
-		XFreeFontNames(fontlist);
 	return font;
 }
 
-/* Stub out XCreateFontSet - but return the right values so we don't 
-   freak out GTK 
-*/
+/* Stub out XCreateFontSet*/
 XFontSet
 XCreateFontSet(Display *display, _Xconst char *base_font_name_list, 
 	char ***missing_charset_list_return, int *missing_charset_count_return,
@@ -198,4 +148,21 @@ XCreateFontSet(Display *display, _Xconst char *base_font_name_list,
 	*missing_charset_list_return = NULL;
 	*missing_charset_count_return = 0;
 	return NULL;
+}
+
+/* Stub out XGetFontProperty*/
+Bool
+XGetFontProperty(XFontStruct * font, Atom atom, unsigned long *value_return)
+{
+printf("XGetFontProperty called\n");
+	switch (atom) {
+	case XA_FONT:			/* 18*/
+	case XA_UNDERLINE_POSITION:	/* 51*/
+	case XA_UNDERLINE_THICKNESS:	/* 52*/
+		break;
+	default:
+		printf("XGetFontProperty: Unknown FontProperty Atom %d\n",
+			(int)atom);
+	}
+	return 0;
 }

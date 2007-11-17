@@ -56,7 +56,7 @@ drawArc(Drawable d, GC gc, int x, int y, int width, int height,
 		if (endAngle >= FULLCIRCLE)
 			endAngle = endAngle % FULLCIRCLE;
 	}
-	/*printf("drawArc %d,%d %d,%d %d,%d (%d,%d)\n", x, y, width, height, angle1/64, angle2/64, startAngle/64, endAngle/64);*/
+	/*printf("drawArc x/y w/h s/e %d,%d %d,%d %d,%d (%d,%d)\n", x, y, width, height, angle1/64, angle2/64, startAngle/64, endAngle/64);*/
 
 	/* Call Nano-X routine, requires floating point*/
 	GrArcAngle(d, gc->gid, x+rx, y+ry, rx, ry, startAngle, endAngle, mode);

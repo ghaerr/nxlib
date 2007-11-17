@@ -26,7 +26,7 @@ _nxCreateCursor(GR_WINDOW_ID cursor, GR_RECT * cbb,
 	h = min(mbb->height, MWMAX_CURSOR_SIZE);
 	bmask = GrNewBitmapFromPixmap(mask, mbb->x, mbb->y, w, h);
 	if (!bmask) {
-		Xfree(bcursor);
+		free(bcursor);
 		return 0;
 	}
 

@@ -88,16 +88,18 @@ XwcTextListToTextProperty(Display *display, wchar_t **list, int count,
 	if (!count)
 		return Success;
 	
-	strs = (char **) malloc(count * sizeof(char *));
-	if (!strs) return XNoMemory;
+	strs = (char **)Xmalloc(count * sizeof(char *));
+	if (!strs)
+		return XNoMemory;
 	       
 	for(i = 0; i < count; i++) {
 		wchar_t *wstr = list[i];
 		char *ptr = 0;
 		int len = wcslen(wstr);
 
-		ptr = strs[i] = (char *) calloc(wcslen(wstr) + 1, sizeof(char));
-		if (!strs[i]) continue;
+		ptr = strs[i] = (char *)Xcalloc(wcslen(wstr) + 1, sizeof(char));
+		if (!strs[i])
+			continue;
 
 		for(l = 0; l < len; l++) {
 			int ch = wctob(*wstr++);
@@ -108,11 +110,10 @@ XwcTextListToTextProperty(Display *display, wchar_t **list, int count,
 	ret = XStringListToTextProperty((char **) strs, count, text_prop_return);
 
 	/* Free the converted functions */
-
 	for(i = 0; i < count; i++) 
-		if (strs[i]) free(strs[i]);
+		if (strs[i])Xfree(strs[i]);
 	
-	free(strs);
+	Xfree(strs);
 	return ret;       
 }
 
@@ -127,28 +128,28 @@ XwcTextPropertyToTextList(Display* display, const XTextProperty* text_prop,
 	int count = 0;
 
 	/* Nothing to encode */
-
 	if (!text_prop->nitems) {
 		*count_return = 0;
 		*list_return = 0;
 		return Success;
 	}
 
-
 	while(1) {
 		wchar_t *rptr;
 		char *vptr = value;
 		int l;
 
-		if (!*value) break;
+		if (!*value)
+			break;
 
 		if (!ret) 
-			ret = (wchar_t **) malloc((count + 1) * sizeof(wchar_t *));
+			ret = (wchar_t **)Xmalloc((count + 1) * sizeof(wchar_t *));
 		else
-			ret = (wchar_t **) realloc(ret, (count + 1) * sizeof(wchar_t *));
+			ret = (wchar_t **)Xrealloc(ret, (count + 1) * sizeof(wchar_t *));
 
-		if (!ret) return XNoMemory;
-		rptr = ret[count] = (wchar_t *) calloc(sizeof(wchar_t), strlen(value) + 1);
+		if (!ret)
+			return XNoMemory;
+		rptr = ret[count] = (wchar_t *)Xcalloc(sizeof(wchar_t), strlen(value) + 1);
 
 		if (!ret[count]) 
 			goto next_string;
@@ -159,11 +160,11 @@ XwcTextPropertyToTextList(Display* display, const XTextProperty* text_prop,
 		*rptr++ = L'\0';
 		count++;
 
-	next_string:
+next_string:
 		value += strlen(value) + 1;
 	}
 
-	ret = (wchar_t **) realloc(ret, (count + 1) * sizeof(wchar_t *));
+	ret = (wchar_t **)Xrealloc(ret, (count + 1) * sizeof(wchar_t *));
 	ret[count] = 0;
 
 	*list_return = ret;
@@ -175,12 +176,12 @@ XwcTextPropertyToTextList(Display* display, const XTextProperty* text_prop,
 void
 XwcFreeStringList(wchar_t **list)
 {
-	int i = 0;
+	int i;
 
 	if (!list)
 		return;
 
 	for(i = 0; list[i]; i++)
-		free(list[i]);
-	free(list);
+		Xfree(list[i]);
+	Xfree(list);
 }

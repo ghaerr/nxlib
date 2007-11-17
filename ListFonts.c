@@ -9,7 +9,7 @@ struct _list {
 	struct _list *next;
 };
 
-static struct _list *g_fontlist = 0;
+static struct _list *g_fontlist = NULL;
 
 static struct _list *
 _createFontList(void)
@@ -21,6 +21,7 @@ _createFontList(void)
 			(struct _list *)Xcalloc(sizeof(struct _list), 1);
 	else {
 		struct _list *t;
+
 		for (t = g_fontlist; t->next; t = t->next)
 			continue;
 		ptr = t->next =
@@ -40,8 +41,8 @@ _addFontToList(struct _list *list, char *font)
 				(list->alloc + 5) * sizeof(char *));
 		list->alloc += 5;
 	}
-
 	list->list[list->used++] = strdup(font);
+
 	return list->used;
 }
 
@@ -50,12 +51,11 @@ _getFontList(struct _list *list, int *size)
 {
 	if (!list->list) {
 		*size = 0;
-		return 0;
+		return NULL;
 	}
 
 	if (list->alloc != list->used)
-		list->list =
-			Xrealloc(list->list, (list->used) * sizeof(char *));
+		list->list = Xrealloc(list->list, (list->used) * sizeof(char *));
 
 	*size = list->used;
 	return list->list;
@@ -65,7 +65,7 @@ static void
 _freeFontList(char **fontlist)
 {
 	struct _list *ptr = g_fontlist;
-	struct _list *prev = 0;
+	struct _list *prev = NULL;
 
 	if (!fontlist)
 		return;
@@ -74,7 +74,7 @@ _freeFontList(char **fontlist)
 		if (ptr->list == fontlist) {
 			int i;
 			for (i = 0; i < ptr->used; i++)
-				Xfree(ptr->list[i]);
+				free(ptr->list[i]);
 
 			Xfree(ptr->list);
 

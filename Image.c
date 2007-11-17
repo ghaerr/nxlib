@@ -320,7 +320,7 @@ showPartialImage(GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect, GR_RECT *drect, ch
 	}
 
 	/* Allocate a local buffer - this is much faster than doing N GrArea calls */
-	dst = local = (char *) malloc( (drect->width * size) * drect->height);
+	dst = local = (char *)Xmalloc( (drect->width * size) * drect->height);
 
 	if (!local) return;
 
@@ -335,7 +335,7 @@ showPartialImage(GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect, GR_RECT *drect, ch
 	}
 	       
 	GrArea(d, gc, drect->x, drect->y, drect->width, drect->height, local, mode);
-	free(local);
+	Xfree(local);
 }
 
 static int
