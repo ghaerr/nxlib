@@ -91,9 +91,6 @@ void _nxSetDefaultFontDir(void);
 void _nxSetFontDir(char **directories, int ndirs);
 void _nxFreeFontDir(char **list);
 
-/* LoadFont.c*/
-char *_nxFindX11Font(const char *in_font);
-
 /* ChProperty.c */
 int _nxDelAllProperty(Window w);
 

@@ -1,6 +1,6 @@
-15 November 2007
-	* added X11_FONT_DIR3 to default to X11 TTF directory
-	* added scalable font handling to XLoadFont with X11 fonts.dir
+17 November 2007
+	* added X11_FONT_DIR3 to Makefile for X11 default TTF directory
+	* added scalable font & height handling to XLoadFont with X11 fonts.dir
 	* added input window handling to XCreateWindow (Giosis/Foedrowitz)
 	* added BIGENDIAN option to Makefile
 	* fix XCreateBitmapFromData for big endian (Giosis/Foedrowitz)

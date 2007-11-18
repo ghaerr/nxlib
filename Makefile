@@ -15,7 +15,7 @@ MWIN_INCLUDE=$(MWIN)/include
 MWIN_LIB=$(MWIN)/lib
 X11_LIB=$(X11)/lib
 
-# set to font PCF file search directories, rgb.txt file location
+# set to X11 font PCF/TTF font.dir search directories, rgb.txt file location
 X11_FONT_DIR1=/usr/lib/X11/fonts/100dpi
 X11_FONT_DIR2=/usr/lib/X11/fonts/misc
 X11_FONT_DIR3=/usr/lib/X11/fonts/TTF
@@ -130,6 +130,9 @@ distclean: clean
 
 keysymstr.h: 
 	perl ./keymap.pl $(X11_INCLUDE)/X11 > ./keysymstr.h
+
+tt: tt.o $(LIBS)
+	cc -o tt tt.c -L. -lnx11 $(SOEXTRALIBS)
 
 .SUFFIXES:
 .SUFFIXES: .c .o

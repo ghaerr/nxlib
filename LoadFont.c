@@ -4,6 +4,12 @@
 #include <string.h>
 
 static int
+min(int a, int b)
+{
+	return (a < b)? a: b;
+}
+
+static int
 prefix(const char *prestr, char *allstr)
 {
 	while (*prestr)
@@ -14,8 +20,17 @@ prefix(const char *prestr, char *allstr)
 	return 1;
 }
 
-char *
-_nxFindX11Font(const char *xfontname)
+static int
+any(int c, const char *str)
+{
+	while (*str)
+		if (*str++ == c)
+			return 1;
+	return 0;
+}
+
+static char *
+_nxFindX11Font(const char *matchstr, int *height)
 {
 	int fcount, i, f;
 	char *ret;
@@ -23,6 +38,9 @@ _nxFindX11Font(const char *xfontname)
 
 	if (!_nxfontcount)
 		_nxSetDefaultFontDir();
+
+	/* return height 0 unless requested scaleable pixel size*/
+	*height = 0;
 
 	/* Go through all of the font dirs */
 	for (f = 0; f < _nxfontcount; f++) {
@@ -38,77 +56,88 @@ _nxFindX11Font(const char *xfontname)
 			continue;
 		}
 
+		/* Then through each line in the fonts.dir file for XLFD match*/
 		for (i = 0; i < fcount; i++) {
-			char *file = buffer, *font = 0;
+			char *file = buffer, *xlfd;
 
 			fgets(buffer, 128, fontdir);
 
-			/* Remove the end 'o line */
+			/* XLFD is second space separated field*/
 			buffer[strlen(buffer) - 1] = '\0';
+			xlfd = strchr(buffer, ' ');
+			*xlfd++ = '\0';
 
-			/* Find the field seperator */
-
-			font = strchr(buffer, ' ');
-			*font++ = '\0';
-
-			//printf("checking '%s' '%s'\n", xfontname, font);
-			if (strcmp(xfontname, font) == 0) {
+			/* check for exact XLFD match first*/
+			if (strcmp(matchstr, xlfd) == 0) {
+return_fontpath:
+				/* return full path to font file*/
 				ret = (char *) Xmalloc(strlen(_nxfontlist[f]) +
 						      strlen(file) + 2);
 				sprintf(ret, "%s/%s", _nxfontlist[f], file);
 
 				fclose(fontdir);
 				return ret;
+			} else {
+				/* otherwise check for scaleable font match spec
+				 * with passed pixel size, that is:
+				 *     match XLFD  "...normal--0-0-0-0-0-..."
+				 * with passed     "...normal--12-0-0-0-0-..."
+				 * for height 12.
+				 */
+				int j;
+				int reqsize = 0;
+				int dashcount = 0;
+				int len = min(strlen(xlfd), strlen(matchstr));
+
+				/* match passed scaleable height at '--0-' in XLFD string*/
+				for (j = 0; j < len && dashcount < 8; j++) {
+					if (xlfd[j] == '-')
+						++dashcount;
+					if (dashcount == 7 && xlfd[j] == '0' && xlfd[j] != matchstr[j]) {
+						int st = j;
+						while (matchstr[j] >= '0' && matchstr[j] <= '9') {
+							reqsize = reqsize * 10 + (matchstr[j++] - '0');
+						}
+						if (strcmp(&matchstr[j], &xlfd[st+1]) == 0) {
+							*height = reqsize;
+							goto return_fontpath;
+						}
+						break;
+					}
+				}
 			}
 		}
 
-		/* not found, try <prefix.pcf> */
+		/* Not found, check each line for passed prefix within fontname*/
 		fseek(fontdir, 0L, SEEK_SET);
 		fgets(buffer, 128, fontdir);
 		for (i = 0; i < fcount; i++) {
-			char *file = buffer, *font = 0;
+			char *file = buffer, *p;
 
 			fgets(buffer, 128, fontdir);
 
-			/* Remove the end 'o line */
+			/* fontname is first space separated field*/
 			buffer[strlen(buffer) - 1] = '\0';
+			p = strchr(buffer, ' ');
+			*p = '\0';
 
-			/* Find the field seperator */
-
-			font = strchr(buffer, ' ');
-			*font++ = '\0';
-
-			//printf("chk2 '%s' '%s'\n", xfontname, file);
-			if (prefix(xfontname, file)) {
-				ret = (char *) Xmalloc(strlen(_nxfontlist[f]) +
-						      strlen(file) + 2);
-				sprintf(ret, "%s/%s", _nxfontlist[f], file);
-
-				fclose(fontdir);
-				return ret;
-			}
+			/* prefix allows font.pcf to match font.pcf.gz for example*/
+			if (prefix(matchstr, file))
+				goto return_fontpath;
 		}
 
 		if (fontdir)
 			fclose(fontdir);
 	}
-	return 0;
-}
-
-static int
-any(int c, const char *str)
-{
-	while (*str)
-		if (*str++ == c)
-			return 1;
-	return 0;
+	return NULL;
 }
 
 Font
 XLoadFont(Display * dpy, _Xconst char *name)
 {
 	GR_FONT_ID font = 0;
-	char *fontname;
+	char *	   fontname;
+	int	   height;
 
 	/* first check for wildcards*/
 	if (any('*', name) || any('?', name)) {
@@ -122,18 +151,18 @@ XLoadFont(Display * dpy, _Xconst char *name)
 	} else
 		fontname = (char *)name;
 
-	/* first try to find from X11/fonts.dir file*/
-	fontname = _nxFindX11Font(fontname);
+	/* first try to find XLFD or fontname from X11/fonts.dir file*/
+	fontname = _nxFindX11Font(fontname, &height);
 
 	/* if not found, try 6x13 for "fixed"*/
 	if (!fontname && !strcmp(name, "fixed"))
-		fontname = _nxFindX11Font("6x13");
+		fontname = _nxFindX11Font("6x13", &height);
 
 	/* found font, load into server*/
 	if (fontname)
-		font = GrCreateFont(fontname, 0, NULL);
+		font = GrCreateFont(fontname, height, NULL);
 
-printf("XLoadFont('%s') = '%s' [%d]\n", name, fontname, font);
+printf("XLoadFont('%s') = '%s' height %d [%d]\n", name, fontname, height, font);
 	if (fontname)
 		Xfree(fontname);
 	return font;
