@@ -93,14 +93,17 @@ return_fontpath:
 				for (j = 0; j < len && dashcount < 8; j++) {
 					if (xlfd[j] == '-')
 						++dashcount;
-					if (dashcount == 7 && xlfd[j] == '0' && xlfd[j] != matchstr[j]) {
-						int st = j;
-						while (matchstr[j] >= '0' && matchstr[j] <= '9') {
-							reqsize = reqsize * 10 + (matchstr[j++] - '0');
-						}
-						if (strcmp(&matchstr[j], &xlfd[st+1]) == 0) {
-							*height = reqsize;
-							goto return_fontpath;
+					if (xlfd[j] != matchstr[j]) {
+						if (dashcount == 7 && xlfd[j] == '0') {
+							int st = j;
+							while (matchstr[j] >= '0' && matchstr[j] <= '9') {
+								reqsize = reqsize * 10 + (matchstr[j++] - '0');
+							}
+							/* rest of XLFD line must match for now*/
+							if (strcmp(&matchstr[j], &xlfd[st+1]) == 0) {
+								*height = reqsize;
+								goto return_fontpath;
+							}
 						}
 						break;
 					}
