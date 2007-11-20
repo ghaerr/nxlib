@@ -16,6 +16,7 @@ MWIN_LIB=$(MWIN)/lib
 X11_LIB=$(X11)/lib
 
 # set to X11 font PCF/TTF font.dir search directories, rgb.txt file location
+# if not required, set X11_FONT_DIRx=0
 X11_FONT_DIR1=/usr/lib/X11/fonts/100dpi
 X11_FONT_DIR2=/usr/lib/X11/fonts/misc
 X11_FONT_DIR3=/usr/lib/X11/fonts/TTF
