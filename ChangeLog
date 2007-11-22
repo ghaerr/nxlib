@@ -1,4 +1,5 @@
 17 November 2007
+	* change XFillArc/XFillArcs to add one to width/height
 	* added X11_FONT_DIR3 to Makefile for X11 default TTF directory
 	* added scalable font & height handling to XLoadFont with X11 fonts.dir
 	* added input window handling to XCreateWindow (Giosis/Foedrowitz)

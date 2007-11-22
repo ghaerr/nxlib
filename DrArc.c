@@ -14,6 +14,7 @@ drawArc(Drawable d, GC gc, int x, int y, int width, int height,
 	if (angle2 == 0)
 		return;
 
+#if 0
 	/*
 	 * Convert X11 width/height to Nano-X radius required
 	 * for arc drawing.
@@ -26,9 +27,9 @@ drawArc(Drawable d, GC gc, int x, int y, int width, int height,
 		--width;
 	if (!(height & 1))
 		--height;
+#endif
 	rx = width / 2;
 	ry = height / 2;
-
 	/*
 	 * Convert X11 start/distance angles to Nano-X start/end angles.
 	 */
@@ -56,9 +57,6 @@ drawArc(Drawable d, GC gc, int x, int y, int width, int height,
 		if (endAngle >= FULLCIRCLE)
 			endAngle = endAngle % FULLCIRCLE;
 	}
-	/*printf("drawArc x/y w/h s/e %d,%d %d,%d %d,%d (%d,%d)\n", x, y, width, height, angle1/64, angle2/64, startAngle/64, endAngle/64);*/
-
-	/* Call Nano-X routine, requires floating point*/
 	GrArcAngle(d, gc->gid, x+rx, y+ry, rx, ry, startAngle, endAngle, mode);
 }
 
@@ -68,6 +66,7 @@ XDrawArc(Display *display, Drawable d, GC gc, int x, int y,
 {
 	/* X11 width/height is one less than Nano-X width/height*/
 	drawArc(d, gc, x, y, width+1, height+1, angle1, angle2, GR_ARC);
+
 	return 1;
 }
 
@@ -90,7 +89,7 @@ int
 XFillArc(Display *display, Drawable d, GC gc, int x, int y,
 	unsigned int width, unsigned int height, int angle1, int angle2)
 {
-	drawArc(d, gc, x, y, width, height, angle1, angle2, GR_PIE);
+	drawArc(d, gc, x, y, width+1, height+1, angle1, angle2, GR_PIE);
 	return 1;
 }
 
@@ -100,8 +99,8 @@ XFillArcs(Display *display, Drawable d, GC gc, XArc *arcs, int narcs)
 	int i;
 
 	for (i = 0; i < narcs; i++) {
-		drawArc(d, gc, arcs->x, arcs->y, arcs->width,
-			arcs->height, arcs->angle1, arcs->angle2, GR_PIE);
+		drawArc(d, gc, arcs->x, arcs->y, arcs->width+1, arcs->height+1,
+			arcs->angle1, arcs->angle2, GR_PIE);
 		++arcs;
 	}
 	return 1;
