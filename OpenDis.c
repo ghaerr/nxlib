@@ -352,3 +352,15 @@ XServerVendor(Display *display)
 {
 	return ServerVendor(display);
 }
+
+unsigned long
+XBlackPixel(Display * display, int screen_number)
+{
+	return display->screens[screen_number].black_pixel;
+}
+
+unsigned long
+XWhitePixel(Display * display, int screen_number)
+{
+	return display->screens[screen_number].white_pixel;
+}

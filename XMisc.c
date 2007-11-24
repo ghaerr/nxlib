@@ -9,25 +9,6 @@ XMisc.c -  code fragments taken from xlib/XlibUtil.c
 (c) Andreas Foedrowitz  
 ******************************************************************************/
 
-//#include <stdlib.h>
-//#include <string.h>
-//#include <X11/X.h>
-//#include <X11/Xatom.h>
-//#include <X11/Xlib.h>
-//#include <X11/Xutil.h>
-
-unsigned long
-XBlackPixel(Display * display, int screen_number)
-{
-	return display->screens[screen_number].black_pixel;
-}
-
-unsigned long
-XWhitePixel(Display * display, int screen_number)
-{
-	return display->screens[screen_number].white_pixel;
-}
-
 char *
 XDisplayString(Display * display)
 {

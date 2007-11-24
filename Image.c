@@ -290,119 +290,137 @@ XGetImage(Display * display, Drawable d, int x, int y,
 	return image;
 }
 
-/*
- * Output a non-palettized image.  Never uses colormap, but instead
- * uses GrArea with image depth parameter for server conversion.
- */
-
 /* This takes a portion of the image buffer and rearranges it to keep from 
    freaking out GrArea. This will take into account a shifted src_x 
    (or a width that is not as large as the declared image width).
 */
-
 static void
-showPartialImage(GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect, GR_RECT *drect, char *src, int mode)
+showPartialImage(Display *display, GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect,
+	GR_RECT *drect, char *src, int pixtype)
 {
-	char *dst = 0, *local = 0;
+	char *dst, *buffer;
 	char *ptr = src;  /* This will already be adjusted to the inital X and Y of the image */
 	int r, size = 0;
 
-	switch(mode) {
+	switch(pixtype) {
 	case MWPF_TRUECOLOR332: 
-		size = 1; break;
+		size = 1;
+		break;
 	case MWPF_TRUECOLOR555:
 	case MWPF_TRUECOLOR565:
-		size = 2; break;
+		size = 2;
+		break;
 	case MWPF_TRUECOLOR888:
-		size = 3; break;
+		size = 3;
+		break;
 	case MWPF_TRUECOLOR0888:
-		size = 4; break;
+		size = 4;
+		break;
+	case MWPF_HWPIXELVAL:
+		size = display->screens[0].root_depth / 8;
+		break;
 	}
 
 	/* Allocate a local buffer - this is much faster than doing N GrArea calls */
-	dst = local = (char *)Xmalloc( (drect->width * size) * drect->height);
-
-	if (!local) return;
+	dst = buffer = (char *)ALLOCA( (drect->width * size) * drect->height);
+	if (!dst)
+		return;
 
 	/* Copy each row to the buffer */
-
 	for(r = 0; r < drect->height; r++) {
 		memcpy(dst, ptr, drect->width * size); 
 		dst += (drect->width * size);
 
-		ptr += (srect->width - srect->x) * size;  /* Move to the end of the line on the real buffer */
-		ptr += (srect->x * size);              /* And then offset ourselves accordingly          */
+		/* Move to the end of the line on the real buffer */
+		ptr += (srect->width - srect->x) * size;
+
+		/* And then offset ourselves accordingly          */
+		ptr += (srect->x * size);
 	}
 	       
-	GrArea(d, gc, drect->x, drect->y, drect->width, drect->height, local, mode);
-	Xfree(local);
+	GrArea(d, gc, drect->x, drect->y, drect->width, drect->height, buffer, pixtype);
+	FREEA(buffer);
 }
 
+/*
+ * Output a truecolor (non-palettized) image using GrArea.
+ * Image bits may need Nano-X conversion if not in hw pixel format.
+ */
 static int
 putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 	int src_x, int src_y, int dest_x, int dest_y,
 	unsigned int width, unsigned int height)
 {
-	int mode = MWPF_PIXELVAL;
-	unsigned char *src = image->data;
+	int		pixtype = MWPF_HWPIXELVAL;	/* assume hw pixel format*/
+	unsigned char *	src;
 
-#ifdef DEBUG
-	printf("putTrueColorImage depth %d  src %d,%d wxh %d,%d dst %d,%d\n",
-	       image->depth, src_x, src_y, width, height, dest_x, dest_y);
-#endif
-
+	/* convert pixtype if image bpp not hw format*/
 	switch (image->bits_per_pixel) {
-	case 1:	// major FIXME
+	case 1:
 		printf("putTruecolorImage bpp 1 FIXME\n");
 		src = image->data;
-		return 1; // must return, will crash server
-		break;
+		return 0; // must return, will crash server major FIXME
 	case 8:
-		mode = MWPF_TRUECOLOR332;
+		if (display->screens[0].root_depth != 8)
+			pixtype = MWPF_TRUECOLOR332;
 		src = image->data + (src_y * image->bytes_per_line) + src_x;
 		break;
 	case 16:
-		if (display->screens[0].root_visual->bits_per_rgb == 5)
-			mode = MWPF_TRUECOLOR555;
-		else
-			mode = MWPF_TRUECOLOR565;
+		if (display->screens[0].root_depth != 16) {
+			/* we don't check 565 vs 555 here, just assume hw format*/
+			if (display->screens[0].root_visual->bits_per_rgb == 5)
+				pixtype = MWPF_TRUECOLOR555;
+			else
+				pixtype = MWPF_TRUECOLOR565;
+		}
 		src = image->data + (src_y * image->bytes_per_line) + (src_x << 1);
 		break;
 	case 24:
-		mode = MWPF_TRUECOLOR888;
+		if (display->screens[0].root_depth != 24)
+			pixtype = MWPF_TRUECOLOR888;
 		src = image->data + (src_y * image->bytes_per_line) + (src_x * 3);
 		break;
 	case 32:
-		mode = MWPF_TRUECOLOR0888;
+		if (display->screens[0].root_depth != 32)
+			pixtype = MWPF_TRUECOLOR0888;
 		src = image->data + (src_y * image->bytes_per_line) + (src_x << 2);
 		break;
 	default:
 		printf("XPutImage: unsupported bpp %d\n", image->bits_per_pixel);
+		return 0;
 	}
 
-#ifdef DEBUG
-	printf("putTrueColorImage nxmode = %d\n", mode);
+#if 1
+	printf("putTrueColorImage depth %d pixtype %d src %d,%d wxh %d,%d dst %d,%d\n",
+	       image->depth, pixtype, src_x, src_y, width, height, dest_x, dest_y);
 #endif
+	/* X11 does draw backgrounds on pixmaps but not text... ugh...*/
+	/* this likely will set the GC incorrectly for future non-pixmap draws*/
+	GrSetGCUseBackground(gc->gid, GR_TRUE);
 
 	/* We can only do a direct GrArea if the width is the same as the width
 	   of our image buffer.  Otherwise, we need to move to a slower path that
 	   handles the situation better.
 	*/
-
-	if (!src_x && width == image->width) 
+	if (src_x == 0 && width == image->width)
 		GrArea((GR_WINDOW_ID)d, (GR_GC_ID)gc->gid, dest_x, dest_y,
-		       width, height, src, mode);
+		       width, height, src, pixtype);
 	else {
 		GR_RECT srect, drect;
-		srect.x = src_x;  srect.y = src_y;
-		srect.width = image->width;  srect.height = image->height;
-		
-		drect.x = dest_x;  drect.y = dest_y;
-		drect.width = width;  drect.height = height;
-		
-		showPartialImage((GR_WINDOW_ID) d, (GR_GC_ID) gc->gid, &srect, &drect, src, mode);
-	}
 
+		srect.x = src_x;
+		srect.y = src_y;
+		srect.width = image->width;
+		srect.height = image->height;
+
+		drect.x = dest_x;
+		drect.y = dest_y;
+		drect.width = width;
+		drect.height = height;
+
+		showPartialImage(display, (GR_WINDOW_ID)d, (GR_GC_ID)gc->gid,
+			&srect, &drect, src, pixtype);
+	}
 	return 1;
 }
 
@@ -489,7 +507,7 @@ XPutImage(Display * display, Drawable d, GC gc, XImage * image,
 	unsigned int height)
 {
 	// FIXME bpp 1
-	if (XDefaultVisual(display, 0)->class == TrueColor && image->depth != 1)
+	if (display->screens[0].root_visual->class == TrueColor && image->depth != 1)
 		return putTrueColorImage(display, d, gc, image, src_x, src_y,
 			dest_x, dest_y, width, height);
 	return putImage(display, d, gc, image, src_x, src_y, dest_x, dest_y,

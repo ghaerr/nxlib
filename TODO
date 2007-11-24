@@ -1,3 +1,7 @@
+fix GrSetGCUseBackground force TRUE in putTrueColorImage
+check putTrueColorImage could be called with XGetImage-created
+	MWPF_PIXELVAL, not hw format, yet match depth
+fix X/WhitePixel to align with bpp size, also Background in GC
 clipping on oval windows on fltk forms
 width/height vs radius in Arc draws buggy for all even widths
 	fltk valuators dial problems, arc/fill borders incorrect

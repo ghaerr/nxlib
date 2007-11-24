@@ -1,4 +1,6 @@
-17 November 2007
+23 November 2007
+	* change XPutImage to use new MWPF_HWPIXELVAL pixtype
+	* force UseBackground true in XPutImage
 	* change XFillArc/XFillArcs to add one to width/height
 	* added X11_FONT_DIR3 to Makefile for X11 default TTF directory
 	* added scalable font & height handling to XLoadFont with X11 fonts.dir
