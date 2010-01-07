@@ -148,3 +148,5 @@ int XSetWMClientMachine() { printf("XSetWMClientMachine called\n"); return 0; }
 int XSetWMColormapWindows() { printf("XSetWMColormapWindows called\n"); return 0; } 
 int XStoreColor() { printf("XStoreColor called\n"); return 0; }
 int XStoreColors() { printf("XStoreColors called\n"); return 0; }
+int _XUnknownNativeEvent() { printf("_XUnknownNativeEvent called\n"); return 0; }
+int Xutf8LookupString() { printf("Xutf8LookupString called\n"); return 0; }
