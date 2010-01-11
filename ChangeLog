@@ -1,3 +1,6 @@
+10 January 20107
+	* revised Xlcint.h removed varargs.h, added stdargs.h
+30 November 2007
 	* ported FLTK 2.0.x (stubbed _XUnknownNativeEvent,XutfLookupString)
 23 November 2007
 	* change XPutImage to use new MWPF_HWPIXELVAL pixtype

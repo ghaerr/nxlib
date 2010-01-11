@@ -71,7 +71,7 @@ from The Open Group.
 #include "Xresource.h"
 #include "Xutil.h"
 /*#include "Xvarargs.h"*/
-#include "varargs.h"
+#include "stdarg.h"
 
 typedef Bool (*XFilterEventProc)(
 #if NeedFunctionPrototypes
