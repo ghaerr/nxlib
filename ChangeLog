@@ -1,4 +1,4 @@
-10 January 20107
+Version 0.46 - 23 Jan 2010 - greg@censoft.com
 	* revised Xlcint.h removed varargs.h, added stdargs.h
 30 November 2007
 	* ported FLTK 2.0.x (stubbed _XUnknownNativeEvent,XutfLookupString)
