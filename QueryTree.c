@@ -8,6 +8,6 @@ XQueryTree(Display * display, Window w, Window * root_return,
 	*root_return = GR_ROOT_WINDOW_ID;
 
 	GrQueryTree(w, (GR_WINDOW_ID *) parent_return,
-		    (GR_WINDOW_ID **) children_return, nchildren_return);
+		    (GR_WINDOW_ID **) children_return, (GR_COUNT *)nchildren_return);
 	return 1;
 }

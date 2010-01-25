@@ -49,7 +49,7 @@ from The Open Group.
 
 /*#include "Xlibint.h"*/
 #include "nxlib.h"
-#include "Xresource.h"
+#include "X11/Xresource.h"
 
 /* Not cost effective, at least for vanilla MIT clients */
 /* #define PERMQ */

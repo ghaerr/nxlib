@@ -97,7 +97,7 @@ XChangeProperty(Display * display, Window w, Atom property,
 			}
 
 			Xfree(prop->data);
-			prop->data = p;
+			prop->data = (unsigned char *)p;
 			prop->nelements += nelements;
 			prop->bytes = bytes;
 			break;
@@ -108,7 +108,7 @@ XChangeProperty(Display * display, Window w, Atom property,
 		if (prop->data)
 			Xfree(prop->data);
 		prop->bytes = nelements * (format / 8);
-		prop->data = (char *) Xmalloc(prop->bytes);
+		prop->data = (unsigned char *) Xmalloc(prop->bytes);
 		memcpy(prop->data, data, prop->bytes);
 
 		prop->property = property;

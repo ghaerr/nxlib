@@ -17,7 +17,7 @@
 /*
  * bet you never thought you'd see both of these in the same file ;-)
  */
-#include "Xlib.h"
+#include "X11/Xlib.h"
 #include <nano-X.h>
 
 #include <stdio.h>

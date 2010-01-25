@@ -1,4 +1,7 @@
 Version 0.46 - 24 Jan 2010 - greg@censoft.com
+	* revised Makefile to allow compiling without X11 installed
+	* created internal X11 directory for X11 hdrs if not present
+	* added test directory with X11 test applications
 	* revised Xlcint.h removed varargs.h, added stdargs.h
 30 November 2007
 	* ported FLTK 2.0.x (stubbed _XUnknownNativeEvent,XutfLookupString)

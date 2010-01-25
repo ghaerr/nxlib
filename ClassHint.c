@@ -1,5 +1,5 @@
 #include "nxlib.h"
-#include "Xutil.h"
+#include "X11/Xutil.h"
 
 XClassHint *
 XAllocClassHint(void)

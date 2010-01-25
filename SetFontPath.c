@@ -1,5 +1,5 @@
 #include "nxlib.h"
-#include "Xatom.h"
+#include "X11/Xatom.h"
 #include <string.h>
 
 static char **

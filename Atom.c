@@ -1,5 +1,5 @@
 #include <string.h>
-#include "Xatom.h"
+#include "X11/Xatom.h"
 #include "nxlib.h"
 
 #define SZHASHTABLE	64
@@ -83,7 +83,7 @@ XGetAtomName(Display * display, Atom atom)
 
 		for (val = hash_list[i]; val; val = val->next)
 			if (val->atom == atom) {
-				unsigned char *name = strdup(val->name);
+				char *name = strdup(val->name);
 				return name;
 			}
 	}

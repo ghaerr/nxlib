@@ -308,8 +308,8 @@ strcmpn(unsigned char *s1, unsigned char *s2)
 static int
 comparefunc(const void* a, const void* b)
 {
-	char *aa = *(char **)a;
-	char *bb = *(char **)b;
+	unsigned char *aa = *(unsigned char **)a;
+	unsigned char *bb = *(unsigned char **)b;
 
 	return strcmpn(aa, bb);
 }

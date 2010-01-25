@@ -1,3 +1,4 @@
+add local fonts for testing into fonts dir
 fix GrSetGCUseBackground force TRUE in putTrueColorImage
 check putTrueColorImage could be called with XGetImage-created
 	MWPF_PIXELVAL, not hw format, yet match depth

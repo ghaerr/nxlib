@@ -51,13 +51,13 @@ from The Open Group.
 #include	<ctype.h>
 /*#include	"Xlibint.h"*/
 #include	"nxlib.h"
-#include	"Xresource.h"
-#include	"Xlcint.h"
+#include	"X11/Xresource.h"
+#include	"X11/Xlcint.h"
 #ifdef XTHREADS
 #include	"locking.h"
 #endif
-#include 	"XrmI.h"
-#include	"Xos.h"
+#include 	"X11/XrmI.h"
+#include	"X11/Xos.h"
 
 #ifdef __STDC__
 #define Const const

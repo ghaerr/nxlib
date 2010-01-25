@@ -1,5 +1,5 @@
 #include "nxlib.h"
-#include "Xatom.h"
+#include "X11/Xatom.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -163,7 +163,7 @@ XLoadFont(Display * dpy, _Xconst char *name)
 
 	/* found font, load into server*/
 	if (fontname)
-		font = GrCreateFont(fontname, height, NULL);
+		font = GrCreateFont((GR_CHAR *)fontname, height, NULL);
 
 printf("XLoadFont('%s') = '%s' height %d [%d]\n", name, fontname, height, font);
 	if (fontname)

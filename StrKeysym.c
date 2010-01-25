@@ -2,8 +2,8 @@
 
 #include "nxlib.h"
 #include <string.h>
-#include "keysym.h"
-#include "Xutil.h"
+#include "X11/keysym.h"
+#include "X11/Xutil.h"
 #include "keysymstr.h"
 
 /* Standard keymapings for kernel values */

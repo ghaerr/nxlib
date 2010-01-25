@@ -1,6 +1,6 @@
 #include "nxlib.h"
 #include <string.h>
-#include "Xutil.h"
+#include "X11/Xutil.h"
 
 void
 XSetWMName(Display * display, Window w, XTextProperty * name)
@@ -80,11 +80,11 @@ XmbSetWMProperties(Display *dpy, Window w, _Xconst char *windowName,
 
 	/* fake up XTextProperty struct members for XSetWMName*/
 	if (windowName) {
-		wname.value = (char *)windowName;
+		wname.value = (unsigned char *)windowName;
 		wprop = &wname;
 	}
 	if (iconName) {
-		iname.value = (char *)iconName;
+		iname.value = (unsigned char *)iconName;
 		iprop = &iname;
 	}
 	XSetWMProperties(dpy, w, wprop, iprop, argv, argc, sizeHints, wmHints,

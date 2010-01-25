@@ -1,43 +1,76 @@
+# 24 Jan 2010
 #
-# Nano-X11 library makefile - Greg Haerr <greg@censoft.com>
+# NXLIB library makefile - X11 Conversion Library for Nano-X
+# Greg Haerr <greg@censoft.com>
 #
-# note: if build fails, rebuild keysymstr.h by "make distclean",
-#       then "make"
+# Note: if build fails, rebuild keysymstr.h by "make distclean", then "make"
 #
-# 17 November 2007
-#
-
-# set to Microwindows and X11 include and lib directories
-MWIN=../microwin/src
-xMWIN=/home/greg/net/microwin/src
-X11=/usr/X11R6
-
-MWIN_INCLUDE=$(MWIN)/include
-MWIN_LIB=$(MWIN)/lib
-X11_LIB=$(X11)/lib
-
-# set to X11 font PCF/TTF font.dir search directories, rgb.txt file location
-# if not required, set X11_FONT_DIRx=0
-X11_FONT_DIR1=/usr/lib/X11/fonts/100dpi
-X11_FONT_DIR2=/usr/lib/X11/fonts/misc
-X11_FONT_DIR3=/usr/lib/X11/fonts/TTF
-X11_RGBTXT=/usr/lib/X11/rgb.txt
 
 # set to Y for big endian architecture (should be automatic)
+#
 BIGENDIAN=N
 
-# set to Y to make shared X11 libs
-SHAREDLIB=Y
-LIBNAME = X11
-xSOLIBREV = 6.1
-SOLIBREV = 6.2
+# Compile-time nano-X include and lib directories. (relative paths ok)
+#
+MWIN_INCLUDE=../microwin/src/include
+MWIN_LIB=../microwin/src/lib
+
+# Compile-time X11 include directory
+#
+# Although X11 headers haven't changed structurally in years,
+# these locations should match headers on target system.
+# NXLIB includes local X11R6 headers in case X11 isn't installed
+# on the cross-compiling host.
+#
+# if X11 not installed:
+#	X11_INCLUDE=.
+# if X11 installed:
+#	X11_INCLUDE=/usr/include/X11
+#
+X11_INCLUDE=.
+#X11_INCLUDE=/usr/include/X11
+
+# Run-time font directory and rgb.txt file location:
+# For testing, relative paths are ok, default is local rgb.txt
+#	X11_RGBTXT=X11/rgb.txt
+#	X11_FONTS=fonts
+#
+# For release, full paths are required matching target system locations
+#	X11_RGBTXT=/usr/share/X11/rgb.txt
+#	X11_FONTS=/usr/share/X11/fonts
+#
+X11_RGBTXT=X11/rgb.txt
+X11_FONTS=fonts
+#X11_RGBTXT=/usr/share/X11/rgb.txt
+#X11_FONTS=/usr/share/X11/fonts
+
+# Run-time X11 diretories for PCF/Truetype font.dir file locations
+# if not required:
+#	X11_FONT_DIR1=0
+#	X11_FONT_DIR2=0
+#	X11_FONT_DIR3=0
+X11_FONT_DIR1=$(X11_FONTS)/100dpi
+X11_FONT_DIR2=$(X11_FONTS)/misc
+X11_FONT_DIR3=$(X11_FONTS)/TTF
+
+# NXLIB library name and installation directory for "make install"
+# Installation is only required when wanting to completely
+# create a libX11.so that allows unmodified changes to X11
+# application makefiles. In the normal case, and when
+# cross-compiling on a system with X11, no installation
+# is possible (as libX11.so would be replaced), and
+# the link command is changed from -lX11 to -lNX11
+LIBNAME=NX11
+INSTALL_DIR=.
+xINSTALL_DIR=/usr/local/lib/X11
+
+# set to Y to make shared libNX11.so library, shared lib dependencies
+SHAREDLIB=N
+SOLIBREV=6.2
+SOEXTRALIBS = -L$(MWIN_LIB) -lnano-X
 
 # set to Y to include (unmodifed X11) Xrm routines
 INCLUDE_XRM=Y
-
-# shared library dependencies and shared library install dir
-SOEXTRALIBS = -L$(MWIN_LIB) -lnano-X
-INSTALL_DIR = $(X11_LIB)
 
 # compiler flags
 CC = gcc
@@ -45,7 +78,8 @@ LN = ln -s
 MV = mv
 RM = rm -f
 DEBUG = -g
-CFLAGS += -Wall $(DEBUG) -I$(MWIN_INCLUDE)
+CFLAGS += -Wall $(DEBUG)
+CFLAGS += -I$(MWIN_INCLUDE) -I$(X11_INCLUDE)
 CFLAGS += -DX11_FONT_DIR1=\"$(X11_FONT_DIR1)\"
 CFLAGS += -DX11_FONT_DIR2=\"$(X11_FONT_DIR2)\"
 CFLAGS += -DX11_FONT_DIR3=\"$(X11_FONT_DIR3)\"
@@ -80,7 +114,7 @@ xOBJS += xrm/Xrm.o xrm/ParseCmd.o xrm/Misc.o xrm/Quarks.o xrm/lcWrap.o \
 CFLAGS += -I.
 endif
 
-LIBS = libnx11.a
+LIBS = lib$(LIBNAME).a
 
 ifeq ($(BIGENDIAN), Y)
 CFLAGS += -DCPU_BIG_ENDIAN=1
@@ -93,19 +127,20 @@ endif
 
 all: $(LIBS)
 
-# static nx11 library
-libnx11.a: keysymstr.h $(OBJS)
-	ar r libnx11.a $(OBJS)
+# static NXLIB library
+lib$(LIBNAME).a: keysymstr.h $(OBJS)
+	ar r lib$(LIBNAME).a $(OBJS)
 
 # shared X11 library
 lib$(LIBNAME).so.$(SOLIBREV): $(OBJS)
 	$(RM) $@~
 	@SONAME=`echo $@ | sed 's/\.[^\.]*$$//'`; set -x; \
 	$(CC) -o ./$@~ -shared -Wl,-soname,$$SONAME $(OBJS) $(SOEXTRALIBS) -lc; \
-	$(RM) $$SONAME; $(LN) $@ $$SONAME;
-	$(RM) $@
+#	$(RM) $$SONAME; $(LN) $@ $$SONAME;
+#	$(RM) $@
 	$(MV) $@~ $@
-	$(RM) lib$(LIBNAME).so; $(LN) $@ lib$(LIBNAME).so
+#	$(RM) lib$(LIBNAME).so; $(LN) $@ lib$(LIBNAME).so
+	$(MV) $@ lib$(LIBNAME).so
 
 install: $(LIBS)
 	$(RM) $(INSTALL_DIR)/lib$(LIBNAME).so; \
@@ -115,13 +150,13 @@ install: $(LIBS)
 	$(MV) lib$(LIBNAME).so.$$MAJREV $(INSTALL_DIR)
 	$(RM) $(INSTALL_DIR)/lib$(LIBNAME).so.$(SOLIBREV); \
 	$(MV) lib$(LIBNAME).so.$(SOLIBREV) $(INSTALL_DIR)
-##	$(MV) libnx11.a $(INSTALL_DIR)
+#	$(MV) lib$(LIBNAME).a $(INSTALL_DIR)
 
 clean: cleanlibs
 	$(RM) *.o *~
 
 cleanlibs:
-	$(RM) libnx11.a
+	$(RM) lib$(LIBNAME).a
 	$(RM) lib$(LIBNAME).so
 	@MAJREV=`expr $(SOLIBREV) : '\(.*\)\.'`; \
 	set -x; $(RM) lib$(LIBNAME).so.$$MAJREV

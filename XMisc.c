@@ -1,6 +1,6 @@
 #include "nxlib.h"
-#include "Xutil.h"
-#include "Xatom.h"
+#include "X11/Xutil.h"
+#include "X11/Xatom.h"
 #include <stdlib.h>
 #include <string.h>
 

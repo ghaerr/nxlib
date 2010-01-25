@@ -11,7 +11,7 @@
 
 /* get next int from buffer, return next buf position*/
 static char *
-strInt(int *retint, char *buf)
+strInt(unsigned int *retint, char *buf)
 {
 	char *	q;
 	char	tmp[256];

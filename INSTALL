@@ -1,26 +1,29 @@
 NXLIB build and installation instructions
-Version 0.46, November 17, 2007
+Version 0.46, January 24, 20107
 
 1. Modify Makefile to set Microwindows and X11 include and lib directories
-	MWIN=/pathto/microwin/src
-	X11=/usr/X11R6
+	MWIN_INCLUDE=/pathto/microwin/src/include
+	MWIN_LIB=/pathto/microwin/src/lib
+	X11_INCLUDE=/usr/X11R6/include
+	or, if X11 not installed on cross-compiling host, use nxlib's X11 headers
+	X11_INCLUDE=.
 
 	Microwindows v0.90 or later must be used.
 
 2. Modify Makefile to set X11 PCF and Truetype font search directories
-	X11_FONT_DIR1=/usr/lib/X11/fonts/100dpi
-	X11_FONT_DIR2=/usr/lib/X11/fonts/misc
-	X11_FONT_DIR3=/usr/lib/X11/fonts/TTF
+	X11_FONT_DIR1=/usr/share/X11/fonts/100dpi
+	X11_FONT_DIR2=/usr/share/X11/fonts/misc
+	X11_FONT_DIR3=/usr/share/X11/fonts/TTF
 
 	More fonts directories can be added in font.c
 
 3. Modify Makefile to set rgb.txt file location
-	X11_RGBTXT=/usr/lib/X11/rgb.txt
+	X11_RGBTXT=/usr/share/X11/rgb.txt
 
-4. Modify Makefile to enable X11 shared library and version if desired
+4. Modify Makefile to enable NXLIB shared library and version if desired
 	SHAREDLIB=Y
-	LIBNAME = X11
-	SOLIBREV = 6.2
+	LIBNAME=X11
+	SOLIBREV=6.2
 	CFLAGS += -DXCONST=_Xconst
 
 	Because of X11 hdr version inconstencies, you may need to set 
@@ -32,8 +35,11 @@ Version 0.46, November 17, 2007
 	If DEBUG = -g, a larger library will be built with debug information.
 	If INCLUDE_XRM=Y, unmodified Xrm database routines will be included.
 
-6. DO NOT "make install" UNTIL YOU BACK UP THE FOLLOWING LIBRARIES.
-   NOTE "make install" WILL BY DEFAULT OVERWRITE THE FOLLOWING FILES:
+6. Modify X11 application link lines to use -lNX11.  Otherwise you
+	will have to install NXLIB has libX11.so.  Change LIBNAME=X11 above,
+	and then set INSTALL_DIR=<path to X11 libraries>.
+	DO NOT "make install" UNTIL YOU BACK UP THE FOLLOWING LIBRARIES.
+	NOTE "make install" WILL BY DEFAULT OVERWRITE THE FOLLOWING FILES:
 
 	/usr/X11R6/lib/libX11.so.*
 	(/usr/X11R6/lib/libX11.so /usr/X11R6/lib/libX11.so.6 /usr/X11R6/lib/libX11.so.6.2)

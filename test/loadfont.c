@@ -1,7 +1,8 @@
-#include "X.h"
-#include "Xlib.h"
+#include <stdlib.h>
+#include "X11/X.h"
+#include "X11/Xlib.h"
 /*
- * Demonstrate XLoadFont
+ * NXLIB XLoadFont demonstration
  *
  * Loads a scaleable and non-scaleable font to test X11_FONT_DIRs
  * and parsing pixel height for scaleable fonts

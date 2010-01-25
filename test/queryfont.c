@@ -1,5 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
+/*
+ * queryfont.c - NXLIB test program to print font infomation
+ */
 
 #define FONT "-adobe-helvetica-medium-r-normal--11-80-100-100-p-56-iso8859-1" /*helvR08*/
 void
@@ -33,7 +38,7 @@ main(int ac, char **av)
 		int i, size;
 
 		printf("font %s\n", font);
-		printf("fid 0x%x\n", fs->fid);
+		printf("fid 0x%x\n", (unsigned int)fs->fid);
 		printf("direction %d\n", fs->direction);
 		printf("min_byte2 %d\n", fs->min_char_or_byte2);
 		printf("max_byte2 %d\n", fs->max_char_or_byte2);

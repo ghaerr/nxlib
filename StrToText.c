@@ -16,8 +16,8 @@
 #include <string.h>
 #include <wchar.h>
 
-#include "Xutil.h"
-#include "Xatom.h"
+#include "X11/Xutil.h"
+#include "X11/Xatom.h"
 
 Status
 XStringListToTextProperty(char **argv, int argc, XTextProperty * ret)
@@ -41,7 +41,7 @@ XStringListToTextProperty(char **argv, int argc, XTextProperty * ret)
 		if (!buffer)
 			return 0;
 
-		proto.value = buffer;
+		proto.value = (unsigned char *)buffer;
 
 		for (i = 0; i < argc; i++) {
 			if (argv[i]) {
@@ -53,7 +53,7 @@ XStringListToTextProperty(char **argv, int argc, XTextProperty * ret)
 		}
 	} else {
 		proto.nitems = 0;
-		if (!(proto.value = (char *) Xmalloc(1)))
+		if (!(proto.value = (unsigned char *) Xmalloc(1)))
 			return 0;
 
 		*proto.value = '\0';
@@ -123,7 +123,7 @@ int
 XwcTextPropertyToTextList(Display* display, const XTextProperty* text_prop,
 	wchar_t*** list_return, int* count_return)
 {
-	char *value = text_prop->value;
+	char *value = (char *)text_prop->value;
 	wchar_t **ret = 0;
 	int count = 0;
 
