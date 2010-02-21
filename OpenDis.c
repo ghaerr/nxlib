@@ -28,13 +28,13 @@ XOpenDisplay(_Xconst char *display)
  * Connect with Nano-X server and allocate a display structure.
  */
 	if (fd < 0 && (fd = GrOpen()) < 0) {
-		fprintf(stderr, "nx11: can't connect to nano-X server\r\n");
+		fprintf(stderr, "nxlib: can't connect to nano-X server\r\n");
 		return NULL;
 	}
 
 	GrGetScreenInfo(&sinfo);
 	if (sinfo.bpp < 8) {
-		fprintf(stderr, "nx11: Unsupported bpp: %d\n", sinfo.bpp);
+		fprintf(stderr, "nxlib: Unsupported bpp: %d\n", sinfo.bpp);
 		GrClose();
 		return NULL;
 	}
@@ -184,7 +184,7 @@ XOpenDisplay(_Xconst char *display)
 	    }
 	    sp->root_depth  = sp->depths[0].depth;
 	    sp->root_visual = &sp->depths[0].visuals[0];
-	    printf("nx11: display bpp = %d, bits_per_rgb %d\n",
+	    printf("nxlib: display bpp %d, bits_per_rgb %d\n",
 	    	sp->root_depth, sp->root_visual->bits_per_rgb);
 
 	    /* can't call next function until default visual in place*/

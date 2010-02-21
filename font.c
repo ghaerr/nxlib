@@ -23,6 +23,16 @@ _nxLoadFontDir(char *str)
 }
 
 
+FILE *
+_nxLoadFontAlias(char *str)
+{
+	char path[256];
+
+	sprintf(path, "%s/fonts.alias", str);
+	return fopen(path, "r");
+}
+
+
 void
 _nxSetDefaultFontDir(void)
 {

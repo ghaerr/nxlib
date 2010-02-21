@@ -87,6 +87,7 @@ GR_COLOR _nxColorvalFromPixelval(Display *dpy, unsigned long pixelval);
 extern char **_nxfontlist;
 extern int _nxfontcount;
 FILE * _nxLoadFontDir(char *str);
+FILE * _nxLoadFontAlias(char *str);
 void _nxSetDefaultFontDir(void);
 void _nxSetFontDir(char **directories, int ndirs);
 void _nxFreeFontDir(char **list);

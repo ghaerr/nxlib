@@ -29,12 +29,65 @@ any(int c, const char *str)
 	return 0;
 }
 
+/* check if passed fontstr is aliased in fonts.alias file*/
 static char *
-_nxFindX11Font(const char *matchstr, int *height)
+_nxFindX11FontAlias(const char *fontstr, char *alias)
+{
+	int f;
+	char *p;
+	char buffer[256];
+
+	if (!_nxfontcount)
+		_nxSetDefaultFontDir();
+
+	/* loop through font dirs looking at fonts.alias file*/
+	for (f = 0; f < _nxfontcount; f++) {
+		FILE *aliasfile = _nxLoadFontAlias(_nxfontlist[f]);
+		if (!aliasfile)
+			continue;
+
+		/* Then through each line in the fonts.alias file for match*/
+		for (;;) {
+
+			if (!fgets(buffer, 256, aliasfile))
+				break;
+			buffer[strlen(buffer) - 1] = '\0';
+
+			/* ignore blank and ! comments*/
+			if (buffer[0] == '\0' || buffer[0] == '!')
+				continue;
+
+			/* fontname is first space separated field*/
+			p = strchr(buffer, ' ');
+			*p = '\0';
+
+			/* check exact match*/
+			if (strcmp(fontstr, buffer) == 0) {
+
+				/* alias is second space separated field*/
+				while (*++p == ' ')
+					continue;
+				strcpy(alias, p);
+				fclose(aliasfile);
+				return alias;
+			}
+		}
+		fclose(aliasfile);
+	}
+
+	/* didn't find alias, copy unmodified*/
+	strcpy(alias, fontstr);
+	return alias;
+}
+
+static char *
+_nxFindX11Font(const char *fontstr, int *height)
 {
 	int fcount, i, f;
+	char *matchstr;
 	char *ret;
 	char buffer[128];
+	char alias[256];
 
 	if (!_nxfontcount)
 		_nxSetDefaultFontDir();
@@ -55,6 +108,9 @@ _nxFindX11Font(const char *matchstr, int *height)
 			fclose(fontdir);
 			continue;
 		}
+
+		/* check fonts.alias for font alias*/
+		matchstr = _nxFindX11FontAlias(fontstr, alias);
 
 		/* Then through each line in the fonts.dir file for XLFD match*/
 		for (i = 0; i < fcount; i++) {
@@ -154,12 +210,12 @@ XLoadFont(Display * dpy, _Xconst char *name)
 	} else
 		fontname = (char *)name;
 
-	/* first try to find XLFD or fontname from X11/fonts.dir file*/
+	/* first try to find XLFD or fontname from X11/fonts.dir and fonts.alias files*/
 	fontname = _nxFindX11Font(fontname, &height);
 
-	/* if not found, try 6x13 for "fixed"*/
-	if (!fontname && !strcmp(name, "fixed"))
-		fontname = _nxFindX11Font("6x13", &height);
+//	/* if not found, try 6x13 for "fixed"*/
+//	if (!fontname && !strcmp(name, "fixed"))
+//		fontname = _nxFindX11Font("6x13", &height);
 
 	/* found font, load into server*/
 	if (fontname)

@@ -1,4 +1,4 @@
-# 24 Jan 2010
+# 21 Feb 2010
 #
 # NXLIB library makefile - X11 Conversion Library for Nano-X
 # Greg Haerr <greg@censoft.com>
@@ -31,18 +31,18 @@ X11_INCLUDE=.
 #X11_INCLUDE=/usr/include/X11
 
 # Run-time font directory and rgb.txt file location:
-# For testing, relative paths are ok, default is local rgb.txt
-#	X11_RGBTXT=X11/rgb.txt
+# For testing, relative paths are ok, default is local rgb.txt and fonts
 #	X11_FONTS=fonts
+#	X11_RGBTXT=fonts/rgb.txt
 #
 # For release, full paths are required matching target system locations
+#	X11_FONTS=/usr/share/fonts/X11
 #	X11_RGBTXT=/usr/share/X11/rgb.txt
-#	X11_FONTS=/usr/share/X11/fonts
 #
-X11_RGBTXT=X11/rgb.txt
-X11_FONTS=fonts
-#X11_RGBTXT=/usr/share/X11/rgb.txt
-#X11_FONTS=/usr/share/X11/fonts
+#X11_FONTS=fonts
+#X11_RGBTXT=fonts/rgb.txt
+X11_FONTS=/usr/share/fonts/X11
+X11_RGBTXT=/usr/share/X11/rgb.txt
 
 # Run-time X11 diretories for PCF/Truetype font.dir file locations
 # if not required:
@@ -59,7 +59,7 @@ X11_FONT_DIR3=$(X11_FONTS)/TTF
 # application makefiles. In the normal case, and when
 # cross-compiling on a system with X11, no installation
 # is possible (as libX11.so would be replaced), and
-# the link command is changed from -lX11 to -lNX11
+# the link command is changed from '-lX11' to '-lNX11 -lnano-X'
 LIBNAME=NX11
 INSTALL_DIR=.
 xINSTALL_DIR=/usr/local/lib/X11

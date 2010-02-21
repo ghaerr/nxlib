@@ -1,4 +1,7 @@
-Version 0.46 - 24 Jan 2010 - greg@censoft.com
+21 Feb 2010
+	* revised default Makefile for Ubuntu 9.10 X11 fonts location
+	* added fonts.alias support
+24 Jan 2010 - greg@censoft.com
 	* revised Makefile to allow compiling without X11 installed
 	* created internal X11 directory for X11 hdrs if not present
 	* added test directory with X11 test applications

@@ -31,7 +31,7 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 		if (spec[0] != '#') {
 			/* try to parse the color name */
 			if (GrGetColorByName((char *) spec, &r, &g, &b) == 0) {
-				printf("XParseColor: bad parse on %s\n", spec);
+				printf("XParseColor: passed '%s' is unknown color name\n", spec);
 				return 0;
 			}
 		} else {
@@ -39,13 +39,13 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 			unsigned long val;
 
 			switch (strlen(p)) {
-			case 3:
+			case 3:		/* #RGB*/
 				r = _parseColorStr(&p, 1);
 				g = _parseColorStr(&p, 1);
 				b = _parseColorStr(&p, 1);
 				break;
 
-			case 6:
+			case 6:		/* #RRGGBB*/
 				val = strtol(p, 0, 16);
 				r = (val >> 16) & 0xFF;
 				g = (val >> 8) & 0xFF;
@@ -67,8 +67,7 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 				break;
 
 			default:
-				printf("XParseColor: invalid size %d on %s\n",
-				       strlen(p), p);
+				printf("XParseColor: passed '%s' is invalid format\n", p);
 				return 0;
 			}
 		}
