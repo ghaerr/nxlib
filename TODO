@@ -1,5 +1,7 @@
+check min2/min1 byte calc in QueryFont.c with > 255 glyph fonts
 add local fonts for testing into fonts dir
-fix GrSetGCUseBackground force TRUE in putTrueColorImage
+reorder X11 fonts dir: misc, 100dpi, 75dpi, Type1,
+	remove from Makefile?
 check putTrueColorImage could be called with XGetImage-created
 	MWPF_PIXELVAL, not hw format, yet match depth
 fix X/WhitePixel to align with bpp size, also Background in GC
@@ -31,6 +33,7 @@ allow multiple GrOpen/GrClose calls for multiple XOpenDisplay calls
 implement QLength() dpy->qlen
 fill in font structure
 fix ParentRelative in XSetWindowBackgroundPixmap
+fix GrSetGCUseBackground force TRUE in putTrueColorImage
 
 arc drawing in nano-X is broken (sonar)
 XAllocColor doesn't actually write colormap in truecolor mode: error?

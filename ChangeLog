@@ -1,4 +1,7 @@
 21 Feb 2010
+	* fixes relating to running FLTK 1.1.10 w/NXLIB (requires mwin v0.92RC2)
+	* XParseColor randomly returned incorrect colors, now works #RRRRGGGGBBBB
+	* fix bug in drawing text bk color after drawing Images
 	* revised default Makefile for Ubuntu 9.10 X11 fonts location
 	* added fonts.alias support
 24 Jan 2010 - greg@censoft.com

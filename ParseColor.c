@@ -3,19 +3,20 @@
 #include <string.h>
 
 /* Parse colors of format:
- * #RGB #RRGGBB #RRRGGGBBB  #RRRRGGGGBBBB
+ * #RGB #RRGGBB #RRRRGGGGBBBB
  */
-static int
+static unsigned long
 _parseColorStr(_Xconst char **str, int size)
 {
-	char parse[5];
 	unsigned long val;
+	char parse[5];
 
 	strncpy(parse, *str, size);
-	parse[size + 1] = '\0';
+	parse[size] = '\0';
 	val = strtol(parse, 0, 16);
 	*str += size;
-	return (val);
+
+	return val;
 }
 
 Status
@@ -52,18 +53,10 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 				b = (val & 0xFF);
 				break;
 
-			case 12:	/* #RRRGGGBBB */
-				r = _parseColorStr(&p, 3);
-				g = _parseColorStr(&p, 3);
-				b = _parseColorStr(&p, 3);
-
-				if (r > 0xFF)
-					r >>= 4;
-				if (g > 0xFF)
-					g >>= 4;
-				if (b > 0xFF)
-					b >>= 4;
-
+			case 12:	/* #RRRRGGGGBBBB*/
+				r = _parseColorStr(&p, 4) >> 8;
+				g = _parseColorStr(&p, 4) >> 8;
+				b = _parseColorStr(&p, 4) >> 8;
 				break;
 
 			default:
@@ -77,7 +70,6 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 	exact->green = g << 8;
 	exact->blue = b << 8;
 	exact->flags |= (DoRed | DoGreen | DoBlue);
-
 	return 1;
 }
 

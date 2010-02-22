@@ -394,6 +394,7 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 	printf("putTrueColorImage depth %d pixtype %d src %d,%d wxh %d,%d dst %d,%d\n",
 	       image->depth, pixtype, src_x, src_y, width, height, dest_x, dest_y);
 #endif
+
 	/* X11 does draw backgrounds on pixmaps but not text... ugh...*/
 	/* this likely will set the GC incorrectly for future non-pixmap draws*/
 	GrSetGCUseBackground(gc->gid, GR_TRUE);
@@ -421,6 +422,9 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 		showPartialImage(display, (GR_WINDOW_ID)d, (GR_GC_ID)gc->gid,
 			&srect, &drect, src, pixtype);
 	}
+
+	/* turn background drawing back off... */
+	GrSetGCUseBackground(gc->gid, GR_FALSE);
 	return 1;
 }
 
