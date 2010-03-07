@@ -196,11 +196,11 @@ XLoadFont(Display * dpy, _Xconst char *name)
 {
 	GR_FONT_ID font = 0;
 	char *	   fontname;
-	int	   height;
+	char **	   fontlist = NULL;
+	int	   	   height;
 
 	/* first check for wildcards*/
 	if (any('*', name) || any('?', name)) {
-		char **fontlist;
 		int count;
 
 		/* pick first sorted return value for now...*/
@@ -222,8 +222,10 @@ XLoadFont(Display * dpy, _Xconst char *name)
 		font = GrCreateFont((GR_CHAR *)fontname, height, NULL);
 
 printf("XLoadFont('%s') = '%s' height %d [%d]\n", name, fontname, height, font);
-	if (fontname)
+	if (fontname && (fontname != name))
 		Xfree(fontname);
+	if (fontlist)
+		XFreeFontNames(fontlist);
 	return font;
 }
 

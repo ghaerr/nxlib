@@ -77,8 +77,10 @@ XConvertSelection(Display *display, Atom selection, Atom target, Atom property,
 {
 	struct sstruct *select = find_selection(selection);
 	
-	select->selection = target;
-	select->time = (t == CurrentTime) ? time(0) : t;
+	if (select) {
+		select->selection = target;
+		select->time = (t == CurrentTime) ? time(0) : t;
+	}
 
 	/* We should generate a SelectionRequest event to the owner in this 
 	   situation, or if there is no owner, then a SelectionNotify 
