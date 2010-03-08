@@ -1,18 +1,19 @@
 #include "nxlib.h"
 #include <string.h>
 #include "X11/Xutil.h"
+#include "X11/Xatom.h"
+
+int XSetTransientForHint(Display* display, Window w, Window prop_window) {
+	XChangeProperty(display, w, XA_WM_TRANSIENT_FOR, XA_WINDOW, 32,
+		PropModeReplace, (unsigned char *)&prop_window, 1);
+	return 1;
+}
 
 void
 XSetWMName(Display * display, Window w, XTextProperty * name)
 {
-	GR_WM_PROPERTIES props;
-
-	if (!name || !name->value)
-		return;
-
-	props.flags = GR_WM_FLAGS_TITLE;
-	props.title = name->value;
-	GrSetWMProperties(w, &props);
+	XChangeProperty(display, w, XA_WM_NAME, XA_STRING, 8,
+		PropModeReplace, (unsigned char *)name->value, name->nitems);
 }
 
 /* Not used */

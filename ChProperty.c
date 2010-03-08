@@ -1,5 +1,6 @@
 #include <string.h>
 #include "nxlib.h"
+#include "X11/Xatom.h"
 
 #define SZHASHTABLE	32
 struct window_props {
@@ -26,7 +27,12 @@ XChangeProperty(Display * display, Window w, Atom property,
 {
 	struct windows *win = NULL;
 	struct window_props *prop = NULL;
+	Window prop_window;
 	int hash = w % SZHASHTABLE;
+	GR_WM_PROPERTIES props;
+	
+	if(!nelements || data == NULL)
+		return 1;
 
 	win = window_list[hash];
 	if (!win) {
@@ -84,7 +90,10 @@ XChangeProperty(Display * display, Window w, Atom property,
 				return 0;
 
 			bytes = (prop->nelements + nelements) * f8;
-			p = (char *) Xmalloc(bytes);
+			if(type == XA_STRING) {
+				p = (char *)Xmalloc(bytes+1);  /* alloc + 1 for string '\0'*/
+				p[bytes] = '\0';
+			} else p = (char *)Xmalloc(bytes);
 
 			if (mode == PropModeAppend) {
 				memcpy(p, prop->data, prop->nelements * f8);
@@ -108,7 +117,10 @@ XChangeProperty(Display * display, Window w, Atom property,
 		if (prop->data)
 			Xfree(prop->data);
 		prop->bytes = nelements * (format / 8);
-		prop->data = (unsigned char *) Xmalloc(prop->bytes);
+		if(type == XA_STRING) {
+			prop->data = (unsigned char *) Xmalloc(prop->bytes+1); /* +1 for string 0*/
+			prop->data[prop->bytes] = '\0';
+		} else prop->data = (unsigned char *) Xmalloc(prop->bytes);
 		memcpy(prop->data, data, prop->bytes);
 
 		prop->property = property;
@@ -118,7 +130,49 @@ XChangeProperty(Display * display, Window w, Atom property,
 		break;
 	}
 
+	switch (property) {
+		case XA_WM_TRANSIENT_FOR:
+			prop_window = *((Window *)data);
+			GrGetWMProperties(prop_window, &props);
+			if (props.title)
+				free(props.title);
+			props.flags = GR_WM_FLAGS_PROPS;
+			props.props |= (GR_WM_PROPS_NORAISE | GR_WM_PROPS_NOMOVE | GR_WM_PROPS_NOFOCUS);
+			GrSetWMProperties(prop_window, &props);
+			break;
+		case XA_WM_NAME:
+			props.flags = GR_WM_FLAGS_TITLE;
+			props.title = prop->data;
+			GrSetWMProperties(w, &props);
+			break;
+		default:
+			break;
+	}
+
 	return 1;
+}
+
+static void
+_nxDelPropData(struct window_props *prop)
+{
+	/* delete XA_WM_TRANSIENT_FOR data*/
+	if ((prop->property == XA_WM_TRANSIENT_FOR) && prop->data) {
+		Window prop_window = *((Window*)prop->data);
+		GR_WM_PROPERTIES props;
+
+		GrGetWMProperties(prop_window, &props);
+		if (props.title)
+			free(props.title);
+		props.flags = GR_WM_FLAGS_PROPS;
+		props.props &= ~(GR_WM_PROPS_NORAISE | GR_WM_PROPS_NOMOVE | GR_WM_PROPS_NOFOCUS);
+		GrSetWMProperties(prop_window, &props);
+
+		GrSetFocus(prop_window);
+	}
+
+	if (prop->data)
+		Xfree(prop->data);
+	Xfree(prop);
 }
 
 int
@@ -138,10 +192,7 @@ XDeleteProperty(Display *display, Window w, Atom property)
 						prev->next = prop->next;
 					else
 						win->properties = prop->next;
-
-					if (prop->data)
-						Xfree(prop->data);
-					Xfree(prop);
+					_nxDelPropData(prop);
 
 					if (win == window_list[hash])
 						window_list[hash] = NULL;
@@ -164,15 +215,11 @@ _nxDelAllProperty(Window w)
 			prop = win->properties;
 			while (prop) {
 				struct window_props *next = prop->next;
-
-				if (prop->data)
-					Xfree(prop->data);
-				Xfree(prop);
+				_nxDelPropData(prop);
 				prop = next;
 			}
 
 			Xfree(win);
-
 			if (win == window_list[hash])
 				window_list[hash] = NULL;
 			return 1;

@@ -325,7 +325,8 @@ XListFonts(Display * display, _Xconst char *pattern, int maxnames,
 	*actual_count_return = count;
 
 	/* sort the return, helps for lack of locale info at end of XLFD*/
-	qsort((char *)ret, count, sizeof(char *), comparefunc);
+	if (ret)
+		qsort((char *)ret, count, sizeof(char *), comparefunc);
 
 	return ret;
 }

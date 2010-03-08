@@ -1,4 +1,6 @@
-6 Mar 2010
+8 Mar 2010
+	* add XSetTransientForHint(), XA_WM_TRANSIENT_FOR and XM_WM_NAME handling
+		in XChangeProperty (Johannes)
 	* fix various mem leaks and null ptr issues (Johannes)
 21 Feb 2010
 	* fixes relating to running FLTK 1.1.10 w/NXLIB (requires mwin v0.92RC2)
