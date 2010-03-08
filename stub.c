@@ -117,7 +117,6 @@ int XSetLocaleModifiers() { printf("XSetLocaleModifiers called\n"); return 0; }
 
 int XSetStandardProperties() { printf("XSetStandardProperties called\n"); return 0; } 
 int XSetNormalHints() { printf("XSetNormalHints called\n"); return 0; }
-int XSetTransientForHint() { printf("XSetTransientForHint called\n"); return 0; } 
 int XSetWMProtocols() { printf("XSetWMProtocols called\n"); return 0; } 
 int XSupportsLocale() { printf("XSupportsLocale called\n"); return 1; } 
 int XSynchronize() { printf("XSynchronize called\n"); return 0; } 
