@@ -307,6 +307,17 @@ translateNXEvent(Display *dpy, GR_EVENT * ev, XEvent * event)
 			event->xfocus.detail = NotifyDetailNone;  //FIXME?
 		}
 		break;
+	case GR_EVENT_TYPE_CLOSE_REQ:
+		/* dummy up WM_DELETE_WINDOW message for FLTK*/
+		event->type = ClientMessage;
+		{
+			GR_EVENT_GENERAL *pev = (GR_EVENT_GENERAL *) ev;
+			event->xclient.window = pev->wid;
+			event->xclient.format = 32;
+			event->xclient.data.l[0] = XInternAtom(dpy, "WM_DELETE_WINDOW", 0);
+			//event->xclient.message_type = 
+		}
+		break;
 	default:
 		printf("translateNXEvent: UNHANDLED EVENT %d\n", ev->type);
 	}

@@ -13,7 +13,7 @@ static struct {
 	{ LeaveWindowMask, GR_EVENT_MASK_MOUSE_EXIT },
 	{ PointerMotionMask, GR_EVENT_MASK_MOUSE_MOTION },
 	{ ExposureMask, GR_EVENT_MASK_EXPOSURE },
-	{ StructureNotifyMask, GR_EVENT_MASK_UPDATE },
+	{ StructureNotifyMask, (GR_EVENT_MASK_UPDATE | GR_EVENT_MASK_CLOSE_REQ) },
 	{ SubstructureNotifyMask, GR_EVENT_MASK_CHLD_UPDATE },
 	{ ButtonMotionMask, GR_EVENT_MASK_MOUSE_MOTION },
 	{ FocusChangeMask, (GR_EVENT_MASK_FOCUS_IN | GR_EVENT_MASK_FOCUS_OUT) },

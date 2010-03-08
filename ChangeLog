@@ -1,4 +1,5 @@
 8 Mar 2010
+	* added WM_DELETE_WINDOW handling on GR_EVENT_TYPE_CLOSE_REQ for FLTK
 	* add XSetTransientForHint(), XA_WM_TRANSIENT_FOR and XM_WM_NAME handling
 		in XChangeProperty (Johannes)
 	* fix various mem leaks and null ptr issues (Johannes)
