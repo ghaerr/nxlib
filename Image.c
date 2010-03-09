@@ -42,7 +42,7 @@ put_pixel1(XImage *image, unsigned int x, unsigned int y, unsigned long pixel)
 static unsigned long
 get_pixel8(XImage *image, unsigned int x, unsigned int y)
 {
-	unsigned char *src = image->data + (y * image->bytes_per_line) + x;
+	unsigned char *src = (unsigned char *)image->data + (y * image->bytes_per_line) + x;
 
 	return *src;
 }
@@ -50,7 +50,7 @@ get_pixel8(XImage *image, unsigned int x, unsigned int y)
 static int
 put_pixel8(XImage *image, unsigned int x, unsigned int y, unsigned long pixel)
 {
-	unsigned char *src = image->data + (y * image->bytes_per_line) + x;
+	unsigned char *src = (unsigned char *)image->data + (y * image->bytes_per_line) + x;
 
 	*src = pixel;
 	return 1;
@@ -59,8 +59,7 @@ put_pixel8(XImage *image, unsigned int x, unsigned int y, unsigned long pixel)
 static unsigned long
 get_pixel16(XImage *image, unsigned int x, unsigned int y)
 {
-	unsigned short *src = (unsigned short *)
-		(image->data + (y * image->bytes_per_line) + (x << 1));
+	unsigned short *src = (unsigned short *)(image->data + (y * image->bytes_per_line) + (x << 1));
 
 	return *src;
 }
@@ -68,8 +67,7 @@ get_pixel16(XImage *image, unsigned int x, unsigned int y)
 static int
 put_pixel16(XImage *image, int x, int y, unsigned long pixel)
 {
-	unsigned short *src = (unsigned short *)
-		(image->data + (y * image->bytes_per_line) + (x << 1));
+	unsigned short *src = (unsigned short *)(image->data + (y * image->bytes_per_line) + (x << 1));
 
 	*src = pixel;
 	return 1;
@@ -78,8 +76,7 @@ put_pixel16(XImage *image, int x, int y, unsigned long pixel)
 static unsigned long
 get_pixel32(XImage *image, unsigned int x, unsigned int y)
 {
-	unsigned long *src = (unsigned long *)
-		(image->data + (y * image->bytes_per_line) + (x << 2));
+	unsigned long *src = (unsigned long *)(image->data + (y * image->bytes_per_line) + (x << 2));
 
 	return *src;
 }
@@ -87,8 +84,7 @@ get_pixel32(XImage *image, unsigned int x, unsigned int y)
 static int
 put_pixel32(XImage *image, unsigned int x, unsigned int y, unsigned long pixel)
 {
-	unsigned long *src = (unsigned long *)
-		(image->data + (y * image->bytes_per_line) + (x << 2));
+	unsigned long *src = (unsigned long *)(image->data + (y * image->bytes_per_line) + (x << 2));
 
 	*src = pixel;
 	return 1;
@@ -240,15 +236,15 @@ XGetImage(Display * display, Drawable d, int x, int y,
 	unsigned int width, unsigned int height,
 	unsigned long plane_mask, int format)
 {
-	int depth = 0, drawsize;
+	int depth, drawsize, r, src_rowsize;
+	char *dst, *src, *buffer;
 	Visual *visual;
-	XImage *image = 0;
+	XImage *image;
 	GR_WINDOW_INFO winfo;
 
 	/* Ensure that the block is entirely within the drawable */
 	GrGetWindowInfo(d, &winfo);
-	if (x < 0 || (x + width) > winfo.width ||
-	    y < 0 || (y + height) > winfo.height) {
+	if (x < 0 || (x + width) > winfo.width || y < 0 || (y + height) > winfo.height) {
 		/* Error - BadMatch */
 		printf("XGetImage: Image out of bounds\n");
 		printf("    %d %d - %d %d is out of bounds on %d, %d - %d %d\n",
@@ -264,7 +260,6 @@ XGetImage(Display * display, Drawable d, int x, int y,
 	 * which is always sizeof(GR_PIXELVAL), not hw display format
 	 */
 	depth = sizeof(GR_PIXELVAL) * 8;
-
 #if 0
 	if (depth <= 8)
 		drawsize = 1;
@@ -281,8 +276,31 @@ XGetImage(Display * display, Drawable d, int x, int y,
 	if (!image)
 		return NULL;
 
-	image->data = (char *) Xcalloc(width * height * drawsize, 1);
+	src_rowsize = width * drawsize;		/* bytes per line of image*/
+	image->data = (char *) Xcalloc(src_rowsize * height, 1);
 	GrReadArea(d, x, y, width, height, (void *) image->data);
+
+	/* createImage may have padded image width, may have to copy/re-pad*/
+	if(image->bytes_per_line != src_rowsize) {
+		int pad = image->bytes_per_line - src_rowsize, i;
+		dst = buffer = (char *)Xmalloc(image->bytes_per_line * height);
+		src = image->data;
+
+		/* Copy each row to the buffer */
+		for(r = 0; r < height; r++) {
+			memcpy(dst, src, src_rowsize);
+			dst += src_rowsize;
+
+			/* pad with zeros*/
+			for(i=pad; --i>0; )
+				*dst++ = 0;
+
+			/* Move to the end of the line on src image*/
+			src += src_rowsize;
+		}
+		Xfree(image->data);
+		image->data = buffer;
+	}
 
 	if (format == XYPixmap && plane_mask != 0xFFFFFFFF)
 		printf("XGetImage: plane_mask ignored\n");
@@ -296,7 +314,7 @@ XGetImage(Display * display, Drawable d, int x, int y,
 */
 static void
 showPartialImage(Display *display, GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect,
-	GR_RECT *drect, char *src, int pixtype)
+	GR_RECT *drect, char *src, int pixtype, int pad)
 {
 	char *dst, *buffer;
 	char *ptr = src;  /* This will already be adjusted to the inital X and Y of the image */
@@ -332,7 +350,7 @@ showPartialImage(Display *display, GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect,
 		dst += (drect->width * size);
 
 		/* Move to the end of the line on the real buffer */
-		ptr += (srect->width - srect->x) * size;
+		ptr += (srect->width - srect->x) * size + pad;
 
 		/* And then offset ourselves accordingly          */
 		ptr += (srect->x * size);
@@ -352,7 +370,8 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 	unsigned int width, unsigned int height)
 {
 	int		pixtype = MWPF_HWPIXELVAL;	/* assume hw pixel format*/
-	unsigned char *	src;
+	int		drawsize, pad;
+	char 	*src;
 
 	/* convert pixtype if image bpp not hw format*/
 	switch (image->bits_per_pixel) {
@@ -389,23 +408,21 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 		printf("XPutImage: unsupported bpp %d\n", image->bits_per_pixel);
 		return 0;
 	}
+	drawsize = image->bits_per_pixel / 8;
 
-#if 1
-	printf("putTrueColorImage depth %d pixtype %d src %d,%d wxh %d,%d dst %d,%d\n",
+printf("putTrueColorImage depth %d pixtype %d src %d,%d wxh %d,%d dst %d,%d\n",
 	       image->depth, pixtype, src_x, src_y, width, height, dest_x, dest_y);
-#endif
 
-	/* X11 does draw backgrounds on pixmaps but not text... ugh...*/
-	/* this likely will set the GC incorrectly for future non-pixmap draws*/
+	/* X11 draws backgrounds on pixmaps but not text*/
 	GrSetGCUseBackground(gc->gid, GR_TRUE);
 
-	/* We can only do a direct GrArea if the width is the same as the width
-	   of our image buffer.  Otherwise, we need to move to a slower path that
-	   handles the situation better.
-	*/
-	if (src_x == 0 && width == image->width)
-		GrArea((GR_WINDOW_ID)d, (GR_GC_ID)gc->gid, dest_x, dest_y,
-		       width, height, src, pixtype);
+	/*
+	 * We can only do a direct GrArea if the width is the same as the width
+	 * of our image buffer.  Otherwise, we need to move to a slower path.
+	 */
+	pad = image->bytes_per_line - (image->width * drawsize);
+	if (!pad && (src_x == 0) && (width == image->width))
+		GrArea((GR_WINDOW_ID)d, (GR_GC_ID)gc->gid, dest_x, dest_y, width, height, src, pixtype);
 	else {
 		GR_RECT srect, drect;
 
@@ -420,11 +437,12 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 		drect.height = height;
 
 		showPartialImage(display, (GR_WINDOW_ID)d, (GR_GC_ID)gc->gid,
-			&srect, &drect, src, pixtype);
+			&srect, &drect, src, pixtype, pad);
 	}
 
 	/* turn background drawing back off... */
 	GrSetGCUseBackground(gc->gid, GR_FALSE);
+
 	return 1;
 }
 
@@ -439,8 +457,7 @@ putImage(Display * display, Drawable d, GC gc, XImage * image,
 {
 	unsigned int x, y;
 	unsigned long *buffer, *dst;
-	unsigned char *src = image->data +
-		((src_y * (image->bytes_per_line)) + src_x);
+	char *src = image->data + ((src_y * (image->bytes_per_line)) + src_x);
 	nxColormap *colormap = _nxFindColormap(XDefaultColormap(display, 0));
 
 printf("putImage: bpp %d\n", image->depth);
@@ -514,6 +531,5 @@ XPutImage(Display * display, Drawable d, GC gc, XImage * image,
 	if (display->screens[0].root_visual->class == TrueColor && image->depth != 1)
 		return putTrueColorImage(display, d, gc, image, src_x, src_y,
 			dest_x, dest_y, width, height);
-	return putImage(display, d, gc, image, src_x, src_y, dest_x, dest_y,
-			width, height);
+	return putImage(display, d, gc, image, src_x, src_y, dest_x, dest_y, width, height);
 }
