@@ -308,6 +308,9 @@ translateNXEvent(Display *dpy, GR_EVENT * ev, XEvent * event)
 		}
 		break;
 	case GR_EVENT_TYPE_CLOSE_REQ:
+		/* Could check for WM_DELETE_WINDOW window property, if not set,
+		 * then just call XDestroyWindow, otherwise send ClientMessage.
+		 */
 		/* dummy up WM_DELETE_WINDOW message for FLTK*/
 		event->type = ClientMessage;
 		{
@@ -315,7 +318,7 @@ translateNXEvent(Display *dpy, GR_EVENT * ev, XEvent * event)
 			event->xclient.window = pev->wid;
 			event->xclient.format = 32;
 			event->xclient.data.l[0] = XInternAtom(dpy, "WM_DELETE_WINDOW", 0);
-			//event->xclient.message_type = 
+			//event->xclient.message_type = 		//FIXME?
 		}
 		break;
 	default:
