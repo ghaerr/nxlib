@@ -176,10 +176,9 @@ XOpenDisplay(_Xconst char *display)
 		     * = 8 for 24 & 32 bpp
 		     */
 		    if (sinfo.bpp == 16)
-			vp->bits_per_rgb =
-				(sinfo.pixtype == MWPF_TRUECOLOR555)? 5: 6;
+				vp->bits_per_rgb = (sinfo.pixtype == MWPF_TRUECOLOR555)? 5: 6;
 		    else
-			vp->bits_per_rgb = 8; 	/* 8, 24, 32*/
+				vp->bits_per_rgb = 8; 	/* 8, 24, 32*/
 		}
 	    }
 	    sp->root_depth  = sp->depths[0].depth;
