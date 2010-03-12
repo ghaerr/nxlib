@@ -292,7 +292,7 @@ XGetImage(Display * display, Drawable d, int x, int y,
 			dst += src_rowsize;
 
 			/* pad with zeros*/
-			for(i=pad; --i>0; )
+			for(i=pad; --i>=0; )
 				*dst++ = 0;
 
 			/* Move to the end of the line on src image*/
