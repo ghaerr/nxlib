@@ -1,3 +1,6 @@
+19 Mar 2010
+	* added Xutf8SetWMProperties for mupdf port
+	* added XShmQueryExtension, XShmAttach, XShmCreateImage stubs
 9 Mar 2010
 	* added image padding in XGetImage and XPutImage (Johannes)
 	* added WM_DELETE_WINDOW handling on GR_EVENT_TYPE_CLOSE_REQ for FLTK

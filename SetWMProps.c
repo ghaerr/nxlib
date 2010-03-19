@@ -91,3 +91,12 @@ XmbSetWMProperties(Display *dpy, Window w, _Xconst char *windowName,
 	XSetWMProperties(dpy, w, wprop, iprop, argv, argc, sizeHints, wmHints,
 		classHints);
 }
+
+void
+Xutf8SetWMProperties(Display *dpy, Window w, _Xconst char *windowName,
+	_Xconst char *iconName, char **argv, int argc, XSizeHints * sizeHints,
+	XWMHints * wmHints, XClassHint * classHints)
+{
+	XmbSetWMProperties(dpy, w, windowName, iconName, argv, argc,
+		sizeHints, wmHints, classHints);
+}

@@ -45,6 +45,9 @@ int XkbLibraryVersion() { printf("XkbLibraryVersion called\n"); return 0; }
 int XDisplayKeycodes() { printf("XDisplayKeycodes called\n"); return 0;}
 int XGetKeyboardMapping() { printf("XGetKeyboardMapping called\n"); return 0;}
 int XGetKeyboardControl() { printf("XGetKeyboardControl called\n"); return 0; } 
+int XShmQueryExtension() { printf("XShmQueryExtension called\n"); return 0; } 
+int XShmAttach() { printf("XShmAttach called\n"); return 0; } 
+int XShmCreateImage() { printf("XShmCreateImage called\n"); return 0; } 
 int XShmPutImage() { printf("XShmPutImage called\n"); return 0; } 
 
 /* other required*/
