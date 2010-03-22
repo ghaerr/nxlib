@@ -1,9 +1,8 @@
 #include "nxlib.h"
-#include "X11/Xatom.h"
 #include <string.h>
 
 static char **
-_nxGetFontDir(int *count)
+_nxCopyFontDir(int *count)
 {
 	int i;
 	char **list;
@@ -11,7 +10,7 @@ _nxGetFontDir(int *count)
 	if (!_nxfontcount)
 		_nxSetDefaultFontDir();
 
-	list = (char **) Xcalloc(_nxfontcount+1, sizeof(char *));
+	list = (char **)Xcalloc(_nxfontcount+1, sizeof(char *));
 
 	for (i = 0; i < _nxfontcount; i++)
 		list[i] = strdup(_nxfontlist[i]);
@@ -21,13 +20,13 @@ _nxGetFontDir(int *count)
 }
 
 char **
-XGetFontPath(Display * display, int *npaths_return)
+XGetFontPath(Display *display, int *npaths_return)
 {
-	return _nxGetFontDir(npaths_return);
+	return _nxCopyFontDir(npaths_return);
 }
 
 int
-XSetFontPath(Display * display, char **directories, int ndirs)
+XSetFontPath(Display *display, char **directories, int ndirs)
 {
 	_nxSetFontDir(directories, ndirs);
 	return 1;
@@ -36,6 +35,6 @@ XSetFontPath(Display * display, char **directories, int ndirs)
 int
 XFreeFontPath(char **list)
 {
-	_nxFreeFontDir(list);
+	_nxFreeFontDir(&list);
 	return 1;
 }

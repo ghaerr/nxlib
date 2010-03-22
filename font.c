@@ -38,19 +38,18 @@ _nxSetDefaultFontDir(void)
 {
 	int ndirs = (sizeof(NXDIRLIST) / sizeof(char *)) - 1;
 
-	_nxFreeFontDir(_nxfontlist);
-
 	_nxSetFontDir(NXDIRLIST, ndirs);
 }
 
+/* make a copy of passed dirlist and store in global vars*/
 void
 _nxSetFontDir(char **directories, int ndirs)
 {
 	int i;
 
-	_nxFreeFontDir(_nxfontlist);
+	_nxFreeFontDir(&_nxfontlist);
 
-	_nxfontlist = (char **) Xcalloc(ndirs+1, sizeof(char *));
+	_nxfontlist = (char **)Xcalloc(ndirs+1, sizeof(char *));
 	for (i = 0; i < ndirs; i++)
 		_nxfontlist[i] = strdup(directories[i]);
 
@@ -58,13 +57,20 @@ _nxSetFontDir(char **directories, int ndirs)
 }
 
 void
-_nxFreeFontDir(char **list)
+_nxFreeFontDir(char ***addrlist)
 {
+	char **list = *addrlist;
 	int i;
 
 	if (list) {
 		for (i = 0; list[i]; i++)
 			free(list[i]);
 		Xfree(list);
+	}
+
+	/* possibly zero globals*/
+	if (addrlist == &_nxfontlist) {
+		_nxfontlist = 0;
+		_nxfontcount = 0;
 	}
 }

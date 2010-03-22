@@ -1,4 +1,5 @@
-19 Mar 2010
+21 Mar 2010
+	* fix multiple free() bug in _nxFreeFontDir()
 	* added Xutf8SetWMProperties for mupdf port
 	* added XShmQueryExtension, XShmAttach, XShmCreateImage stubs
 9 Mar 2010

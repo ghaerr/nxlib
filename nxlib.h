@@ -90,7 +90,7 @@ FILE * _nxLoadFontDir(char *str);
 FILE * _nxLoadFontAlias(char *str);
 void _nxSetDefaultFontDir(void);
 void _nxSetFontDir(char **directories, int ndirs);
-void _nxFreeFontDir(char **list);
+void _nxFreeFontDir(char ***list);
 
 /* ChProperty.c */
 int _nxDelAllProperty(Window w);
