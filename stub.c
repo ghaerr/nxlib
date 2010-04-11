@@ -102,7 +102,6 @@ int XOpenIM() { printf("XOpenIM called\n"); return 0; }
 int XParseGeometry() { printf("XParseGeometry called\n"); return 0; } 
 int _XRead() { printf("_XRead called\n"); return 0; } 
 int _XReadPad() { printf("_XReadPad called\n"); return 0; } 
-int XRefreshKeyboardMapping() { printf("XRefreshKeyboardMapping called\n"); return 0; } 
 int XRegisterIMInstantiateCallback() { printf("XRegisterIMInstantiateCallback called\n"); return 0; } 
 int _XReply() { printf("_XReply called\n"); return 0; } 
 int XRestackWindows() { printf("XRestackWindows called\n"); return 0; } 

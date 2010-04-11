@@ -4,7 +4,12 @@
 int
 XSetClipOrigin(Display *display, GC gc, int clip_x_origin, int clip_y_origin)
 {
+	GR_GC_INFO	gcip;
+
 	GrSetGCClipOrigin(gc->gid, clip_x_origin, clip_y_origin);
+
+	GrGetGCInfo(gc->gid, &gcip);
+	GrOffsetRegion(gcip.region, clip_x_origin, clip_y_origin);
 	return 1;
 }
 

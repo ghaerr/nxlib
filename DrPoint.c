@@ -23,8 +23,7 @@ XDrawPoints(Display * display, Drawable d, GC gc,
 		int prevx = 0, prevy = 0;
 
 		for (i = 0; i < npoints; i++) {
-			GrPoint(d, gc->gid, prevx + points->x,
-				prevy + points->y);
+			GrPoint(d, gc->gid, prevx + points->x, prevy + points->y);
 			prevx += points->x;
 			prevy += points->y;
 			++points;

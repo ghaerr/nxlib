@@ -113,11 +113,8 @@ int
 XStoreBuffer(Display * display, _Xconst char *bytes, int nbytes, int buffer)
 {
 	if ((buffer >= 0) && (buffer <= 7)) {
-		return XChangeProperty(display,
-				       display->screens[display->
-							default_screen].root,
-				       (Atom) (XA_CUT_BUFFER0 + buffer),
-				       XA_STRING, 8, PropModeReplace,
+		return XChangeProperty(display, display->screens[display->default_screen].root,
+				       (Atom) (XA_CUT_BUFFER0 + buffer), XA_STRING, 8, PropModeReplace,
 				       (unsigned char *) bytes, nbytes);
 	}
 	return 0;

@@ -6,6 +6,23 @@
 #include "X11/Xutil.h"
 #include "keysymstr.h"
 
+#if linux
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/keyboard.h>
+#include <linux/kd.h>
+
+#define KEYBOARD "/dev/tty0"		/* device to get keymappings from*/
+
+/* kernel unicode tables per shiftstate and scancode*/
+#define NUM_VGAKEYMAPS	(1<<KG_CAPSSHIFT)	/* kernel key maps*/
+static unsigned short	os_keymap[NUM_VGAKEYMAPS][NR_KEYS];
+static MWKEYMOD modstate;
+static int map_loaded = 0;
+#endif /* linux*/
+
 /* Standard keymapings for kernel values */
 /* (from microwin/src/drivers/keymap_standard.h)*/
 /* this table should be retrieved through Microwindows*/
@@ -37,6 +54,151 @@ MWKEY_UNKNOWN,MWKEY_UNKNOWN,MWKEY_UNKNOWN,MWKEY_UNKNOWN,MWKEY_PAUSE,	/* 115*/
 MWKEY_UNKNOWN,MWKEY_UNKNOWN,MWKEY_UNKNOWN,MWKEY_UNKNOWN,MWKEY_UNKNOWN,	/* 120*/
 MWKEY_LMETA, MWKEY_RMETA, MWKEY_MENU					/* 125*/
 };
+
+/* load Linux keyboard mappings, used as first try for scancode conversion*/
+static void
+LoadKernelKeymaps(void)
+{
+#if linux
+	int 		map, i;
+	struct kbentry 	entry;
+	char *		kbd;
+	int 		fd;
+	int		ledstate = 0;
+
+	/* Open "CONSOLE" or /dev/tty device*/
+	if(!(kbd = getenv("CONSOLE")))
+		kbd = KEYBOARD;
+	fd = open(kbd, O_NONBLOCK);
+	if (fd < 0)
+		return;
+
+	/* Load all the keysym mappings */
+	for (map=0; map<NUM_VGAKEYMAPS; ++map) {
+		memset(os_keymap[map], 0, NR_KEYS*sizeof(unsigned short));
+		for (i=0; i<NR_KEYS; ++i) {
+			entry.kb_table = map;
+			entry.kb_index = i;
+
+			if (ioctl(fd, KDGKBENT, &entry) == 0) {
+
+				/* change K_ENTER to \r*/
+				if (entry.kb_value == K_ENTER)
+					entry.kb_value = K(KT_ASCII,13);
+
+				if ((KTYP(entry.kb_value) == KT_LATIN) ||
+				    (KTYP(entry.kb_value) == KT_ASCII) ||
+				    (KTYP(entry.kb_value) == KT_PAD) ||
+				    (KTYP(entry.kb_value) == KT_LETTER))
+						os_keymap[map][i] = entry.kb_value;
+			}
+		}
+	}
+
+	/* preset CAPSLOCK and NUMLOCK from startup LED state*/
+	if (ioctl(fd, KDGETLED, &ledstate) == 0) {
+		if (ledstate & LED_CAP) {
+			modstate |= MWKMOD_CAPS;
+		}
+		if (ledstate & LED_NUM) {
+			modstate |= MWKMOD_NUM;
+		}
+	}
+
+	close(fd);
+	map_loaded = 1;
+#endif /* linux*/
+}
+
+/* translate a scancode and modifier state to an MWKEY*/
+static MWKEY
+TranslateScancode(int scancode)
+{
+	unsigned short	mwkey = 0;
+	int		map = 0;
+
+	/* determine appropriate kernel table*/
+	if (modstate & MWKMOD_SHIFT)
+		map |= (1<<KG_SHIFT);
+	if (modstate & MWKMOD_CTRL)
+		map |= (1<<KG_CTRL);
+	if (modstate & MWKMOD_ALT)
+		map |= (1<<KG_ALT);
+	if (modstate & MWKMOD_ALTGR)
+		map |= (1<<KG_ALTGR);
+	if (KTYP(os_keymap[map][scancode]) == KT_LETTER) {
+		if (modstate & MWKMOD_CAPS)
+			map |= (1<<KG_SHIFT);
+	}
+	if (KTYP(os_keymap[map][scancode]) == KT_PAD) {
+		if (modstate & MWKMOD_NUM) {
+			
+			switch (mwscan_to_mwkey[scancode]) {
+			case MWKEY_KP0:
+			case MWKEY_KP1:
+			case MWKEY_KP2:
+			case MWKEY_KP3:
+			case MWKEY_KP4:
+			case MWKEY_KP5:
+			case MWKEY_KP6:
+			case MWKEY_KP7:
+			case MWKEY_KP8:
+			case MWKEY_KP9:
+				mwkey = mwscan_to_mwkey[scancode] - MWKEY_KP0 + '0';
+				break;
+			case MWKEY_KP_PERIOD:
+				mwkey = '.';
+				break;
+			case MWKEY_KP_DIVIDE:
+				mwkey = '/';
+				break;
+			case MWKEY_KP_MULTIPLY:
+				mwkey = '*';
+				break;
+			case MWKEY_KP_MINUS:
+				mwkey = '-';
+				break;
+			case MWKEY_KP_PLUS:
+				mwkey = '+';
+				break;
+			case MWKEY_KP_ENTER:
+				mwkey = MWKEY_ENTER;
+				break;
+			case MWKEY_KP_EQUALS:
+				mwkey = '-';
+				break;
+			}
+		}
+	} else
+		mwkey = KVAL(os_keymap[map][scancode]);
+
+	if (!mwkey)
+		mwkey = mwscan_to_mwkey[scancode];
+
+	/* perform additional translations*/
+	switch (mwkey) {
+	case 127:
+		mwkey = MWKEY_BACKSPACE;
+		break;
+	case MWKEY_BREAK:
+	case MWKEY_PAUSE:
+		mwkey = MWKEY_QUIT;
+		break;
+	case 0x1c:	/* kernel maps print key to ctrl-\ */
+	case MWKEY_SYSREQ:
+		mwkey = MWKEY_PRINT;
+		break;
+	case MWKEY_NUMLOCK:
+		modstate ^= MWKMOD_NUM;	
+		break;
+	case MWKEY_CAPSLOCK:
+		modstate ^= MWKMOD_CAPS;	
+		break;
+		}
+
+	/* printf("TranslateScancode %02x to mwkey %d\n", scancode, mwkey); */
+	return mwkey;
+}
 
 static struct {
 	GR_KEY nxKey;
@@ -104,6 +266,14 @@ static struct {
 };
 
 
+/* load Linux kernel keymap, ignores parameter*/
+int 
+XRefreshKeyboardMapping(XMappingEvent* event)
+{ 
+	LoadKernelKeymaps();
+	return 0;
+}
+
 /* translate keycode to KeySym, no control/shift processing*/
 KeySym
 XKeycodeToKeysym(Display *dpy, unsigned int kc, int index)
@@ -115,8 +285,8 @@ XKeycodeToKeysym(Display *dpy, unsigned int kc, int index)
 		return NoSymbol;
 
 	/* first convert scancode to mwkey*/
-	mwkey = mwscan_to_mwkey[kc];
-
+	mwkey = TranslateScancode(kc);
+	
 	/* then possibly convert mwkey to X KeySym*/
 	for (i=0; mwkey_to_xkey[i].nxKey != 0xffff; i++) {
 		if (mwkey == mwkey_to_xkey[i].nxKey)
@@ -141,36 +311,50 @@ XLookupString(XKeyEvent *event, char *buffer, int nbytes, KeySym *keysym,
 {
 	KeySym k;
 
-	k = XLookupKeysym(event, 0);
+	modstate &= 0xffff ^ MWKMOD_SHIFT;
+	modstate &= 0xffff ^ MWKMOD_CTRL;
 
 	/* translate Control/Shift*/
-	if ((event->state & ControlMask) && k < 256)
-		k &= 0x1f;
-	else if (event->state & ShiftMask) {
-		if (k >= 'a' && k <= 'z')
-			k = k-'a'+'A';
-		else switch (k) {
-		case '`': k = '~'; break;
-		case '1': k = '!'; break;
-		case '2': k = '@'; break;
-		case '3': k = '#'; break;
-		case '4': k = '$'; break;
-		case '5': k = '%'; break;
-		case '6': k = '^'; break;
-		case '7': k = '&'; break;
-		case '8': k = '*'; break;
-		case '9': k = '('; break;
-		case '0': k = ')'; break;
-		case '-': k = '_'; break;
-		case '=': k = '+'; break;
-		case '\\': k = '|'; break;
-		case '[': k = '{'; break;
-		case ']': k = '}'; break;
-		case ';': k = ':'; break;
-		case '\'': k = '"'; break;
-		case ',': k = '<'; break;
-		case '.': k = '>'; break;
-		case '/': k = '?'; break;
+	if ((event->state & ControlMask) /* && k < 256*/) {
+		modstate |= MWKMOD_CTRL;
+		//k &= 0x1f;
+	} else if (event->state & ShiftMask)
+		modstate |= MWKMOD_SHIFT;
+	else if( event->state & Mod1Mask)
+		modstate |= MWKMOD_ALTGR;
+
+	k = XLookupKeysym(event, 0);
+
+	if(!map_loaded) {
+		/* translate Control/Shift*/
+		if ((event->state & ControlMask) && k < 256)
+			k &= 0x1f;
+		else if (event->state & ShiftMask) {
+			if (k >= 'a' && k <= 'z')
+				k = k-'a'+'A';
+			else switch (k) {
+			case '`': k = '~'; break;
+			case '1': k = '!'; break;
+			case '2': k = '@'; break;
+			case '3': k = '#'; break;
+			case '4': k = '$'; break;
+			case '5': k = '%'; break;
+			case '6': k = '^'; break;
+			case '7': k = '&'; break;
+			case '8': k = '*'; break;
+			case '9': k = '('; break;
+			case '0': k = ')'; break;
+			case '-': k = '_'; break;
+			case '=': k = '+'; break;
+			case '\\': k = '|'; break;
+			case '[': k = '{'; break;
+			case ']': k = '}'; break;
+			case ';': k = ':'; break;
+			case '\'': k = '"'; break;
+			case ',': k = '<'; break;
+			case '.': k = '>'; break;
+			case '/': k = '?'; break;
+			}
 		}
 	}
 
