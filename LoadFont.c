@@ -15,7 +15,7 @@ prefix(const char *prestr, char *allstr)
 	while (*prestr)
 		if (*prestr++ != *allstr++)
 			return 0;
-	if (*allstr != '.')
+	if (*allstr && *allstr != '.')
 		return 0;
 	return 1;
 }
