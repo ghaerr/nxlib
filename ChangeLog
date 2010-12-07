@@ -1,7 +1,12 @@
+7 Dec 2010
+	* remove GrOffsetRegion in XSetClipOrigin, already done in GsPrepareDrawing
+	    this fixes FLTK 1.10 pixmap test program (requires nano-X GrNewRegionFromPixmap fix also)
+	* replace MWPF_TRUECOLOR0888 with TRUECOLOR8888
+	* cleaned up Makefile, default no version numbering on .so lib names
 17 May 2010 - Version 0.46
 	* fix prefix problem in XLoadFont when full filename (not XLFD) passed
 10 Apr 2010
-	* fix XSetClipOrigin to offset current gc clip region also
+	* fix XSetClipOrigin to offset current gc clip region also (REMOVED 12/7/2010!)
 	* load linux kernel keymap when XRefreshKeyboardMapping called (Aron Takacs)
 21 Mar 2010
 	* fix multiple free() bug in _nxFreeFontDir()

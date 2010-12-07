@@ -61,12 +61,12 @@ X11_FONT_DIR3=$(X11_FONTS)/TTF
 # is possible (as libX11.so would be replaced), and
 # the link command is changed from '-lX11' to '-lNX11 -lnano-X'
 LIBNAME=NX11
-INSTALL_DIR=.
-xINSTALL_DIR=/usr/local/lib/X11
+xINSTALL_DIR=.
+INSTALL_DIR=/usr/local/lib
 
 # set to Y to make shared libNX11.so library, shared lib dependencies
 SHAREDLIB=N
-SOLIBREV=6.2
+SOLIBREV=0.46
 SOEXTRALIBS = -L$(MWIN_LIB) -lnano-X
 
 # set to Y to include (unmodifed X11) Xrm routines
@@ -76,6 +76,7 @@ INCLUDE_XRM=Y
 CC = gcc
 LN = ln -s
 MV = mv
+CP = cp -p
 RM = rm -f
 DEBUG = -g
 CFLAGS += -Wall $(DEBUG)
@@ -135,7 +136,7 @@ lib$(LIBNAME).a: keysymstr.h $(OBJS)
 lib$(LIBNAME).so.$(SOLIBREV): $(OBJS)
 	$(RM) $@~
 	@SONAME=`echo $@ | sed 's/\.[^\.]*$$//'`; set -x; \
-	$(CC) -o ./$@~ -shared -Wl,-soname,$$SONAME $(OBJS) $(SOEXTRALIBS) -lc; \
+	$(CC) -o ./$@~ -shared -Wl,-soname,$$SONAME $(OBJS) $(SOEXTRALIBS) -lc;
 #	$(RM) $$SONAME; $(LN) $@ $$SONAME;
 #	$(RM) $@
 	$(MV) $@~ $@
@@ -144,11 +145,11 @@ lib$(LIBNAME).so.$(SOLIBREV): $(OBJS)
 
 install: $(LIBS)
 	$(RM) $(INSTALL_DIR)/lib$(LIBNAME).so; \
-	$(MV) lib$(LIBNAME).so $(INSTALL_DIR)
-	@MAJREV=`expr $(SOLIBREV) : '\(.*\)\.'`; set -x; \
-	$(RM) $(INSTALL_DIR)/lib$(LIBNAME).so.$$MAJREV; \
+	$(CP) lib$(LIBNAME).so $(INSTALL_DIR)
+#	@MAJREV=`expr $(SOLIBREV) : '\(.*\)\.'`; set -x; \
+#	$(RM) $(INSTALL_DIR)/lib$(LIBNAME).so.$$MAJREV; \
 	$(MV) lib$(LIBNAME).so.$$MAJREV $(INSTALL_DIR)
-	$(RM) $(INSTALL_DIR)/lib$(LIBNAME).so.$(SOLIBREV); \
+#	$(RM) $(INSTALL_DIR)/lib$(LIBNAME).so.$(SOLIBREV); \
 	$(MV) lib$(LIBNAME).so.$(SOLIBREV) $(INSTALL_DIR)
 #	$(MV) lib$(LIBNAME).a $(INSTALL_DIR)
 

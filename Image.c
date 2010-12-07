@@ -322,6 +322,7 @@ showPartialImage(Display *display, GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect,
 
 	switch(pixtype) {
 	case MWPF_TRUECOLOR332: 
+	case MWPF_TRUECOLOR233: 
 		size = 1;
 		break;
 	case MWPF_TRUECOLOR555:
@@ -331,7 +332,8 @@ showPartialImage(Display *display, GR_WINDOW_ID d, GR_GC_ID gc, GR_RECT *srect,
 	case MWPF_TRUECOLOR888:
 		size = 3;
 		break;
-	case MWPF_TRUECOLOR0888:
+	case MWPF_TRUECOLOR8888:
+	case MWPF_TRUECOLORABGR:
 		size = 4;
 		break;
 	case MWPF_HWPIXELVAL:
@@ -401,7 +403,7 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 		break;
 	case 32:
 		if (display->screens[0].root_depth != 32)
-			pixtype = MWPF_TRUECOLOR0888;
+			pixtype = MWPF_TRUECOLOR8888;
 		src = image->data + (src_y * image->bytes_per_line) + (src_x << 2);
 		break;
 	default:
@@ -515,8 +517,7 @@ printf("putImage: bpp %d\n", image->depth);
 		}
 	}
 
-	GrArea((GR_WINDOW_ID) d, (GR_GC_ID) gc->gid, dest_x, dest_y,
-	       width, height, buffer, MWPF_RGB);
+	GrArea((GR_WINDOW_ID) d, (GR_GC_ID) gc->gid, dest_x, dest_y, width, height, buffer, MWPF_RGB);
 
 	FREEA(buffer);
 	return 1;
@@ -527,9 +528,9 @@ XPutImage(Display * display, Drawable d, GC gc, XImage * image,
 	int src_x, int src_y, int dest_x, int dest_y, unsigned int width,
 	unsigned int height)
 {
+printf("XputImage %d,%d %d,%d depth %d\n", dest_x, dest_y, width, height, image->depth);
 	// FIXME bpp 1
 	if (display->screens[0].root_visual->class == TrueColor && image->depth != 1)
-		return putTrueColorImage(display, d, gc, image, src_x, src_y,
-			dest_x, dest_y, width, height);
+		return putTrueColorImage(display, d, gc, image, src_x, src_y, dest_x, dest_y, width, height);
 	return putImage(display, d, gc, image, src_x, src_y, dest_x, dest_y, width, height);
 }
