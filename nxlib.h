@@ -2,7 +2,8 @@
 #define _NXLIB_H_
 
 /* Changeable options*/
-#define USE_ALLOCA		1	/* set if system has alloca()*/
+#define USE_ALLOCA				1	/* set if system has alloca()*/
+#define HAVE_STATICFONTS 		0	/* set to include static buffered fonts when no filesystem*/
 #define MALLOC_0_RETURNS_NULL	0	/* not yet needed*/
 
 /* required settings*/
@@ -83,14 +84,18 @@ void _nxPixel2RGB(Display * display, unsigned long color,
 /* QueryColor.c*/
 GR_COLOR _nxColorvalFromPixelval(Display *dpy, unsigned long pixelval);
 
-/* font.c */
-extern char **_nxfontlist;
-extern int _nxfontcount;
-FILE * _nxLoadFontDir(char *str);
-FILE * _nxLoadFontAlias(char *str);
-void _nxSetDefaultFontDir(void);
-void _nxSetFontDir(char **directories, int ndirs);
-void _nxFreeFontDir(char ***list);
+/* font_find.c */
+typedef struct {
+  char *	file;
+  char *	xlfd;
+  unsigned char *data;
+  int 		data_size;
+} nxStaticFontList;
+
+char **font_enumfonts(char *pattern, int maxnames, int *count_return);
+void   font_freefontnames(char **fontlist);
+char * font_findfont(char *name, int height, int width, int *return_height);
+int	   font_findstaticfont(char *fontname, unsigned char** data, int* size);
 
 /* ChProperty.c */
 int _nxDelAllProperty(Window w);

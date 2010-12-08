@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+/* stubbed out calls, need implementations*/
 int XScreenResourceString() { printf("XScreenResourceString called\n"); return 0; } 
 int XWMGeometry() { printf("XWMGeometry called\n"); return 0; } 
 int XGetIconSizes() { printf("XGetIconSizes called\n"); return 0; } 
@@ -10,9 +11,6 @@ int XrmParseCommand() { printf("XrmParseCommand called\n"); return 0; }
 int XQueryKeymap() { printf("XQueryKeymap called\n"); return 0; } 
 int XGetDefault(void *d, char *program, char *option) { printf("XGetDefault %s %s\n", program, option); return 0; } 
 int XRecolorCursor() { printf("XRecolorCursor called\n"); return 0; } 
-
-/* stubbed out calls, need implementations*/
-int XCloseIM() { printf("XCloseIM called\n"); return 0; } 
 int XListExtensions() { printf("XListExtensions called\n"); return 0; } 
 
 /* required for gtk+ 1.2.7*/
@@ -56,8 +54,6 @@ int XAllocColorCells() { printf("XAllocColorCells called\n"); return 0; }
 int _XAllocScratch() { printf("_XAllocScratch called\n"); return 0; } 
 int XAllowEvents() { printf("XAllowEvents called\n"); return 0; } 
 
-int XCreateIC() { printf("XCreateIC called\n"); return 0; } 
-int XDestroyIC() { printf("XDestroyIC called\n"); return 0; } 
 int _XEatData() { printf("_XEatData called\n"); return 0; } 
 int XESetCloseDisplay() { printf("XESetCloseDisplay called\n"); return 0; } 
 int XESetCopyGC() { printf("XESetCopyGC called\n"); return 0; } 
@@ -80,7 +76,6 @@ int _XGetBitsPerPixel() { printf("_XGetBitsPerPixel called\n"); return 0; }
 int XGetGCValues() { printf("XGetGCVAlues called\n"); return 0; }
 int XGetErrorDatabaseText() { printf("XGetErrorDatabaseText called\n"); return 0; } 
 int XGetErrorText() { printf("XGetErrorText called\n"); return 0; } 
-int XGetIMValues() { printf("XGetIMValues called\n"); return 0; } 
 int _XGetScanlinePad() { printf("_XGetScanlinePad called\n"); return 0; } 
 
 int XGetWMHints() { printf("XGetWMHints called\n"); return 0; } 
@@ -98,11 +93,9 @@ int XmbDrawString() { printf("XmbDrawString called\n"); return 0; }
 int XmbLookupString() { printf("XmbLookupString called\n"); return 0; } 
 int XmbTextExtents() { printf("XmbTextExtents called\n"); return 0; } 
 
-int XOpenIM() { printf("XOpenIM called\n"); return 0; } 
 int XParseGeometry() { printf("XParseGeometry called\n"); return 0; } 
 int _XRead() { printf("_XRead called\n"); return 0; } 
 int _XReadPad() { printf("_XReadPad called\n"); return 0; } 
-int XRegisterIMInstantiateCallback() { printf("XRegisterIMInstantiateCallback called\n"); return 0; } 
 int _XReply() { printf("_XReply called\n"); return 0; } 
 int XRestackWindows() { printf("XRestackWindows called\n"); return 0; } 
 int _XSend() { printf("_XSend called\n"); return 0; } 
@@ -111,9 +104,6 @@ int XSetArcMode() { printf("XSetArcMode called\n"); return 0; }
 int XSetCloseDownMode() { printf("XSetCloseDownMode called\n"); return 0; } 
 int XSetErrorHandler() { printf("XSetErrorHandler called\n"); return 0; } 
 int XSetFillRule() { printf("XSetFillRule called\n"); return 0; } 
-int XSetICFocus() { printf("XSetICFocus called\n"); return 0; } 
-int XSetICValues() { printf("XSetICValues called\n"); return 0; } 
-int XSetIMValues() { printf("XSetIMValues called\n"); return 0; } 
 int _XSetLastRequestRead() { printf("_XSetLastRequestRead called\n"); return 0; } 
 int XSetLocaleModifiers() { printf("XSetLocaleModifiers called\n"); return 0; } 
 
@@ -125,8 +115,6 @@ int XSynchronize() { printf("XSynchronize called\n"); return 0; }
 int XUngrabKeyboard() { printf("XUngrabKeyboard called\n"); return 0; } 
 int XUngrabPointer() { printf("XUngrabPointer called\n"); return 0; } 
 int XUngrabServer() { printf("XUngrabServer called\n"); return 0; } 
-int XUnregisterIMInstantiateCallback() { printf("XUnregisterIMInstantiateCallback called\n"); return 0; } 
-int XUnsetICFocus() { printf("XUnsetICFocus called\n"); return 0; } 
 int XVaCreateNestedList() { printf("XVaCreateNestedList called\n"); return 0; } 
 int _XVIDtoVisual() { printf("_XVIDtoVisual called\n"); return 0; } 
 int XWarpPointer() { printf("XWarpPointer called\n"); return 0; } 
@@ -151,3 +139,18 @@ int XStoreColor() { printf("XStoreColor called\n"); return 0; }
 int XStoreColors() { printf("XStoreColors called\n"); return 0; }
 int _XUnknownNativeEvent() { printf("_XUnknownNativeEvent called\n"); return 0; }
 int Xutf8LookupString() { printf("Xutf8LookupString called\n"); return 0; }
+
+int XCreateIC() { printf("XCreateIC called\n"); return 0; } 
+int XDestroyIC() { printf("XDestroyIC called\n"); return 0; } 
+int XSetICFocus() { printf("XSetICFocus called\n"); return 0; } 
+int XSetICValues() { printf("XSetICValues called\n"); return 0; } 
+int XUnsetICFocus() { printf("XUnsetICFocus called\n"); return 0; } 
+
+int XOpenIM() { printf("XOpenIM called\n"); return 0; } 
+int XCloseIM() { printf("XCloseIM called\n"); return 0; } 
+int XGetIMValues() { printf("XGetIMValues called\n"); return 0; } 
+int XSetIMValues() { printf("XSetIMValues called\n"); return 0; } 
+int XRegisterIMInstantiateCallback() { printf("XRegisterIMInstantiateCallback called\n"); return 0; } 
+int XUnregisterIMInstantiateCallback() { printf("XUnregisterIMInstantiateCallback called\n"); return 0; } 
+int XIMOfIC() { printf("XIMOfIC called\n"); return 0; }
+int XLocaleOfIM() { printf("XLocaleOfIM called\n"); return 0; }

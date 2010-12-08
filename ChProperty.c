@@ -90,10 +90,8 @@ XChangeProperty(Display * display, Window w, Atom property,
 				return 0;
 
 			bytes = (prop->nelements + nelements) * f8;
-			if(type == XA_STRING) {
-				p = (char *)Xmalloc(bytes+1);  /* alloc + 1 for string '\0'*/
-				p[bytes] = '\0';
-			} else p = (char *)Xmalloc(bytes);
+			p = (char *)Xmalloc(bytes+1);  /* alloc + 1 for string '\0'*/
+			p[bytes] = '\0';
 
 			if (mode == PropModeAppend) {
 				memcpy(p, prop->data, prop->nelements * f8);
@@ -117,10 +115,9 @@ XChangeProperty(Display * display, Window w, Atom property,
 		if (prop->data)
 			Xfree(prop->data);
 		prop->bytes = nelements * (format / 8);
-		if(type == XA_STRING) {
-			prop->data = (unsigned char *) Xmalloc(prop->bytes+1); /* +1 for string 0*/
-			prop->data[prop->bytes] = '\0';
-		} else prop->data = (unsigned char *) Xmalloc(prop->bytes);
+		prop->data = (unsigned char *) Xmalloc(prop->bytes+1); /* +1 for string '\0'*/
+		prop->data[prop->bytes] = '\0';
+
 		memcpy(prop->data, data, prop->bytes);
 
 		prop->property = property;
