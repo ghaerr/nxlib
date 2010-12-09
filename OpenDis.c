@@ -183,7 +183,7 @@ XOpenDisplay(_Xconst char *display)
 	    }
 	    sp->root_depth  = sp->depths[0].depth;
 	    sp->root_visual = &sp->depths[0].visuals[0];
-	    printf("nxlib: display bpp %d, bits_per_rgb %d\n",
+	    DPRINTF("nxlib: display bpp %d, bits_per_rgb %d\n",
 	    	sp->root_depth, sp->root_visual->bits_per_rgb);
 
 	    /* can't call next function until default visual in place*/

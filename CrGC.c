@@ -100,10 +100,10 @@ setupGC(Display * dpy, GC gc, unsigned long valuemask, XGCValues * values)
 		XSetSubwindowMode(dpy, gc, values->subwindow_mode);
 
 	if (valuemask & GCPlaneMask)
-		printf("XCreatGC: GCPlaneMask not implemented\n");
+		DPRINTF("XCreatGC: GCPlaneMask not implemented\n");
 
 	if (valuemask & GCArcMode)
-		printf("XCreatGC: GCArcMode not implemented\n");
+		DPRINTF("XCreatGC: GCArcMode not implemented\n");
 }
 
 /* note: unused Drawable d */
@@ -146,7 +146,7 @@ XChangeGC(Display *display, GC gc, unsigned long valuemask, XGCValues *values)
 void
 XFlushGC(Display * dpy, GC gc)
 {
-	printf("XFlushGC called, not synced\n");
+	DPRINTF("XFlushGC called, not synced\n");
 }
 
 GContext
@@ -235,7 +235,7 @@ XSetForeground(Display *dpy, GC gc, unsigned long foreground)
 	vp->foreground = foreground;
 	GrSetGCForeground(gc->gid, c);
 
-//printf("XSetForeground clr %x pix %x\n", (int)c, (int)foreground);
+//DPRINTF("XSetForeground clr %x pix %x\n", (int)c, (int)foreground);
 	return 1;
 }
 
@@ -330,8 +330,7 @@ XSetDashes(Display * display, GC gc, int dash_offset,
 	   _Xconst char *dash_list, int n)
 {
 	if (dash_offset)
-		printf("XSetDashes: dash offset not implemented\n");
-
+		DPRINTF("XSetDashes: dash offset not implemented\n"); 
 	GrSetGCDash(gc->gid, (char *)dash_list, n);
 	return 1;
 }

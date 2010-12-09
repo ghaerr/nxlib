@@ -2,13 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define DEBUG
-#ifdef DEBUG
-#define FUNC_ENTER printf("ENTER [%s]\n", __FUNCTION__)
-#define FUNC_EXIT printf("LEAVE [%s]\n", __FUNCTION__)
+#undef DPRINTF
+#define EVDEBUG  0		/* seperate debug flag for this function*/
+
+#if EVDEBUG
+#define FUNC_ENTER DPRINTF("ENTER [%s]\n", __FUNCTION__)
+#define FUNC_EXIT DPRINTF("LEAVE [%s]\n", __FUNCTION__)
+#define DPRINTF(str, args...)   fprintf(stderr, str, ##args)  /* debug output*/
 #else
 #define FUNC_ENTER
 #define FUNC_EXIT
+#define DPRINTF(str, ...)									  /* no debug output*/
 #endif
 
 static GR_UPDATE_TYPE
@@ -286,7 +290,7 @@ translateNXEvent(Display *dpy, GR_EVENT * ev, XEvent * event)
 				//event->xconfigure.above = 
 				//event->xconfigure.override_redirect = 
 			} else
-				printf("translateNXEvent: unhandled update event subtype %d\n", pev->utype);
+				DPRINTF("translateNXEvent: unhandled update event subtype %d\n", pev->utype);
 			break;
 		}
 	case GR_EVENT_TYPE_FOCUS_IN:
@@ -322,7 +326,7 @@ translateNXEvent(Display *dpy, GR_EVENT * ev, XEvent * event)
 		}
 		break;
 	default:
-		printf("translateNXEvent: UNHANDLED EVENT %d\n", ev->type);
+		DPRINTF("translateNXEvent: UNHANDLED EVENT %d\n", ev->type);
 	}
 }
 
@@ -332,7 +336,7 @@ int
 XPutBackEvent(Display *display, XEvent *event)
 {
 	if (saved) {
-		printf("XPutBackEvent: lost event\n");
+		DPRINTF("XPutBackEvent: lost event\n");
 		return 0;
 	}
 	saved = 1;
@@ -359,19 +363,17 @@ XEventsQueued(Display * display, int mode)
 		if (GrPeekEvent(&temp))
 			ret = 1;
 	}
-#ifdef DEBUG
+
 	if (ret)
-		printf("Returning %d events ready\n", ret);
-#endif
+		DPRINTF("Returning %d events ready\n", ret);
+
 	return ret;
 }
 
 int
 XPending(Display * dpy)
 {
-#ifdef DEBUG
-	printf("XPending ");
-#endif
+	DPRINTF("XPending ");
 	return XEventsQueued(dpy, QueuedAfterFlush);
 }
 
@@ -473,18 +475,14 @@ _XIfEvent(Display * display, XEvent * ev, PredFunc predicate, XPointer arg,
 Bool
 XIfEvent(Display * display, XEvent * ev, PredFunc predicate, XPointer arg)
 {
-#ifdef DEBUG
-printf("XIfEvent ");
-#endif
+	DPRINTF("XIfEvent ");
 	return _XIfEvent(display, ev, predicate, arg, 1);
 }
 
 Bool
 XCheckIfEvent(Display * display, XEvent * ev, PredFunc predicate, XPointer arg)
 {
-#ifdef DEBUG
-printf("XCheckIfEvent ");
-#endif
+	DPRINTF("XCheckIfEvent ");
 	return _XIfEvent(display, ev, predicate, arg, 0);
 }
 

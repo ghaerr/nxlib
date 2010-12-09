@@ -1,4 +1,4 @@
-# 8 Dec 2010
+# 9 Dec 2010
 #
 # NXLIB library makefile - X11 Conversion Library for Nano-X
 # Greg Haerr <greg@censoft.com>
@@ -9,6 +9,9 @@
 # set to Y for big endian architecture (should be automatic)
 #
 BIGENDIAN=N
+
+# comment out to stop debug printfs
+CFLAGS += -DDEBUG=1 -g
 
 # Compile-time nano-X include and lib directories. (relative paths ok)
 #
@@ -65,14 +68,14 @@ LN = ln -s
 MV = mv
 CP = cp -p
 RM = rm -f
-DEBUG = -g
-CFLAGS += -Wall $(DEBUG)
+CFLAGS += -Wall
 CFLAGS += -I$(MWIN_INCLUDE) -I$(X11_INCLUDE)
 CFLAGS += -DX11_FONT_DIR1=\"$(X11_FONT_DIR1)\"
 CFLAGS += -DX11_FONT_DIR2=\"$(X11_FONT_DIR2)\"
 CFLAGS += -DX11_FONT_DIR3=\"$(X11_FONT_DIR3)\"
 CFLAGS += -DX11_RGBTXT=\"$(X11_RGBTXT)\"
 xCFLAGS += -O2 -fno-strength-reduce
+CFLAGS += -O3
 
 OBJS = DestWind.o MapWindow.o NextEvent.o OpenDis.o ClDisplay.o\
 	Window.o CrGC.o FreeGC.o StName.o Sync.o Flush.o CrWindow.o\

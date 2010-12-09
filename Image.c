@@ -155,9 +155,7 @@ createImageStruct(unsigned int width, unsigned int height, unsigned int depth,
 
 	image->bits_per_pixel = depth;
 
-#ifdef DEBUG
-	printf("createImage: %d,%d format %d depth %d bytespl %d\n", width, height, format, depth, image->bytes_per_line);
-#endif
+	DPRINTF("createImage: %d,%d format %d depth %d bytespl %d\n", width, height, format, depth, image->bytes_per_line);
 
 	// FIXME check
 	image->red_mask = red_mask;
@@ -186,7 +184,7 @@ createImageStruct(unsigned int width, unsigned int height, unsigned int depth,
 		image->f.put_pixel = put_pixel32;
 		break;
 	default:
-		printf("createImageStruct: unsupported bpp\n");
+		DPRINTF("createImageStruct: unsupported bpp\n");
 	}
 
 	return image;
@@ -204,11 +202,11 @@ XCreateImage(Display * display, Visual * visual, unsigned int depth,
 	unsigned long red_mask = 0, green_mask = 0, blue_mask = 0;
 	
 	if (depth == 24) {
-		printf("XCreateImage: changing depth to GR_PIXELVAL\n");
+		DPRINTF("XCreateImage: changing depth to GR_PIXELVAL\n");
 		depth = sizeof(GR_PIXELVAL) * 8;
 	}
 	if (depth != display->screens[0].root_depth) {
-		printf("XCreateImage: depth != hw_format\n");
+		DPRINTF("XCreateImage: depth != hw_format\n");
 		//if (depth == 1)	//FIXME
 			//depth = sizeof(GR_PIXELVAL) * 8;
 	}
@@ -246,14 +244,14 @@ XGetImage(Display * display, Drawable d, int x, int y,
 	GrGetWindowInfo(d, &winfo);
 	if (x < 0 || (x + width) > winfo.width || y < 0 || (y + height) > winfo.height) {
 		/* Error - BadMatch */
-		printf("XGetImage: Image out of bounds\n");
-		printf("    %d %d - %d %d is out of bounds on %d, %d - %d %d\n",
+		DPRINTF("XGetImage: Image out of bounds\n");
+		DPRINTF("    %d %d - %d %d is out of bounds on %d, %d - %d %d\n",
 		       x, y, width, height, 0, 0, winfo.width, winfo.height);
 		return NULL;
 	}
 
 	if (format == XYPixmap)
-		printf("XGetImage warning: broken for XYPixmap\n");
+		DPRINTF("XGetImage warning: broken for XYPixmap\n");
 
 	/* 
 	 * create XImage in GrReadArea compatible format,
@@ -303,7 +301,7 @@ XGetImage(Display * display, Drawable d, int x, int y,
 	}
 
 	if (format == XYPixmap && plane_mask != 0xFFFFFFFF)
-		printf("XGetImage: plane_mask ignored\n");
+		DPRINTF("XGetImage: plane_mask ignored\n");
 
 	return image;
 }
@@ -378,7 +376,7 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 	/* convert pixtype if image bpp not hw format*/
 	switch (image->bits_per_pixel) {
 	case 1:
-		printf("putTruecolorImage bpp 1 FIXME\n");
+		DPRINTF("putTruecolorImage bpp 1 FIXME\n");
 		src = image->data;
 		return 0; // must return, will crash server major FIXME
 	case 8:
@@ -407,12 +405,12 @@ putTrueColorImage(Display * display, Drawable d, GC gc, XImage *image,
 		src = image->data + (src_y * image->bytes_per_line) + (src_x << 2);
 		break;
 	default:
-		printf("XPutImage: unsupported bpp %d\n", image->bits_per_pixel);
+		DPRINTF("XPutImage: unsupported bpp %d\n", image->bits_per_pixel);
 		return 0;
 	}
 	drawsize = image->bits_per_pixel / 8;
 
-printf("putTrueColorImage depth %d pixtype %d src %d,%d wxh %d,%d dst %d,%d\n",
+DPRINTF("putTrueColorImage depth %d pixtype %d src %d,%d wxh %d,%d dst %d,%d\n",
 	       image->depth, pixtype, src_x, src_y, width, height, dest_x, dest_y);
 
 	/* X11 draws backgrounds on pixmaps but not text*/
@@ -462,7 +460,7 @@ putImage(Display * display, Drawable d, GC gc, XImage * image,
 	char *src = image->data + ((src_y * (image->bytes_per_line)) + src_x);
 	nxColormap *colormap = _nxFindColormap(XDefaultColormap(display, 0));
 
-printf("putImage: bpp %d\n", image->depth);
+DPRINTF("putImage: bpp %d\n", image->depth);
 	if (!colormap)
 		return 0;
 
@@ -510,7 +508,7 @@ printf("putImage: bpp %d\n", image->depth);
 					//cl = ((XGCValues *)gc->ext_data)->foreground;
 					*dst = cl? WHITE: BLACK;
 				} else {
-					printf("XPutImage: unknown color index %x\n", cl);
+					DPRINTF("XPutImage: unknown color index %x\n", cl);
 					*dst = 0;
 				}
 			}
@@ -528,7 +526,7 @@ XPutImage(Display * display, Drawable d, GC gc, XImage * image,
 	int src_x, int src_y, int dest_x, int dest_y, unsigned int width,
 	unsigned int height)
 {
-printf("XputImage %d,%d %d,%d depth %d\n", dest_x, dest_y, width, height, image->depth);
+DPRINTF("XputImage %d,%d %d,%d depth %d\n", dest_x, dest_y, width, height, image->depth);
 	// FIXME bpp 1
 	if (display->screens[0].root_visual->class == TrueColor && image->depth != 1)
 		return putTrueColorImage(display, d, gc, image, src_x, src_y, dest_x, dest_y, width, height);

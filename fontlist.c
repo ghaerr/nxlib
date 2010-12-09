@@ -22,7 +22,7 @@
  * PCF files will be found by filename.pcf or filename.pcf.gz if in a directory
  * Adobe Type1 files will be found by filename.pfb if in a directory
  */
-static char *FONT_DIR_LIST[] = {
+char *FONT_DIR_LIST[] = {
 	"fonts",									/* local font dir w/fonts.alias*/
 	"/usr/share/fonts/X11/misc",				/* pcf fonts w/fonts.dir*/
 	"/usr/share/fonts/X11/100dpi",
@@ -39,7 +39,7 @@ extern unsigned char dejavusansbold[572908];
 extern unsigned char dejavusans[622020];
 extern unsigned char dejavusansmono[320812];
 
-static nxStaticFontList staticFontList[] = {
+nxStaticFontList staticFontList[] = {
 	{"DejaVuSans.ttf","-misc-helvetica-medium-r-normal--0-0-0-0-p-0-iso10646-1",dejavusans,sizeof(dejavusans)},
 	{"DejaVuSans-Bold.ttf","-misc-helvetica-bold-r-normal--0-0-0-0-p-0-iso10646-1",dejavusansbold,sizeof(dejavusansbold)},
 	{"DejaVuSans-Mono.ttf","-misc-courier-medium-r-normal--0-0-0-0-p-0-iso10646-1",dejavusansmono,sizeof(dejavusansmono)},

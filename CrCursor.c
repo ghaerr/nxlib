@@ -31,8 +31,7 @@ _nxCreateCursor(GR_WINDOW_ID cursor, GR_RECT * cbb,
 	}
 
 	if (cbb->width > w || cbb->height > h)
-		printf("nxCreateCursor: truncating original cursor (%d x %d)\n",
-		       cbb->width, cbb->height);
+		DPRINTF("nxCreateCursor: truncating original cursor (%d x %d)\n", cbb->width, cbb->height);
 
 	/*
 	 * Foreground/background reversed from nano-X !!!

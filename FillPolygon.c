@@ -28,7 +28,7 @@ XFillPolygon(Display * display, Drawable d, GC gc,
 	}
 
 //	if (shape == Complex || shape == Convex)
-//		printf("XFillPolygon: Complex/Convex\n");
+//		DPRINTF("XFillPolygon: Complex/Convex\n");
 
 	GrFillPoly(d, gc->gid, npoints, gr_points);
 

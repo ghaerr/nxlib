@@ -196,7 +196,7 @@ TranslateScancode(int scancode)
 		break;
 		}
 
-	/* printf("TranslateScancode %02x to mwkey %d\n", scancode, mwkey); */
+	/* DPRINTF("TranslateScancode %02x to mwkey %d\n", scancode, mwkey); */
 	return mwkey;
 }
 

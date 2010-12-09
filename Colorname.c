@@ -83,7 +83,7 @@ XAllocNamedColor(Display * dpy, Colormap cmap, _Xconst char *colorname,
 
 	/* first look up color in rgb.txt color database */
 	c = GrGetColorByName((char *) colorname, &r, &g, &b);
-//printf("XAllocNamedColor %s = %x\n", colorname, c);
+//DPRINTF("XAllocNamedColor %s = %x\n", colorname, c);
 
 	hard_def->red = exact_def->red = r << 8;
 	hard_def->green = exact_def->green = g << 8;

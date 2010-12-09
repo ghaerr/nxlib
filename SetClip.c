@@ -52,7 +52,7 @@ XSetClipRectangles(Display *display, GC gc, int clip_x_origin, int clip_y_origin
 
 	if (n == 0) {
 		/* FIXME need to disable all output here...*/
-		printf("XSetClipRectangles called with n=0\n");
+		DPRINTF("XSetClipRectangles called with n=0\n");
 		vp->clip_mask = None;	/* None for no output?*/
 		return 1;
 	}

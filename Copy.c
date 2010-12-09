@@ -24,7 +24,7 @@ XCopyPlane(Display * display, Drawable src, Drawable dest, GC gc,
 
 	// FIXME: plane ignored
 	if (plane != 0x00000001)
-		printf("XCopyPlane: plane %x ignored\n", (int)plane);
+		DPRINTF("XCopyPlane: plane %x ignored\n", (int)plane);
 
 #if 0
 	/* test code instead of 1bpp pixmaps for sunclock...*/

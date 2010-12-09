@@ -32,7 +32,7 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 		if (spec[0] != '#') {
 			/* try to parse the color name */
 			if (GrGetColorByName((char *) spec, &r, &g, &b) == 0) {
-				printf("XParseColor: passed '%s' is unknown color name\n", spec);
+				DPRINTF("XParseColor: passed '%s' is unknown color name\n", spec);
 				return 0;
 			}
 		} else {
@@ -60,7 +60,7 @@ XParseColor(Display * display, Colormap colormap, _Xconst char *spec,
 				break;
 
 			default:
-				printf("XParseColor: passed '%s' is invalid format\n", p);
+				DPRINTF("XParseColor: passed '%s' is invalid format\n", p);
 				return 0;
 			}
 		}

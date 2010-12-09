@@ -35,12 +35,12 @@ _nxTranslateEventMask(unsigned long mask)
 	}
 
 	if (notmask) {
-		printf("nxTranslateEventMask no handler for event mask (%08lx): ", mask);
+		DPRINTF("nxTranslateEventMask no handler for event mask (%08lx): ", mask);
 		for (i = 0; i < 31; i++) {
 			if (notmask & (1L << i))
-				printf("%d ", i);
+				DPRINTF("%d ", i);
 		}
-		printf("\n");
+		DPRINTF("\n");
 	}
 
 	return nxmask;

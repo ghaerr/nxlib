@@ -40,7 +40,7 @@ XCreatePixmapFromBitmapData(Display *display, Drawable d, char *data,
 		fc = _nxColorvalFromPixelval(display, fg);
 		bc = _nxColorvalFromPixelval(display, bg);
 	}
-printf("XCreatePixmapFromBitmapData %x,%x\n", (int)fc, (int)bc);
+DPRINTF("XCreatePixmapFromBitmapData %x,%x\n", (int)fc, (int)bc);
 
 #if CPU_BIG_ENDIAN
 	return GrNewPixmapFromData(width, height, fc, bc, (void *)data,

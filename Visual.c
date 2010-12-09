@@ -10,8 +10,7 @@ XMatchVisualInfo(Display * dpy, int screen, int depth, int class,
 	Visual *vp = dp->visuals;
 
 	if (screen != 0 || dp->depth != depth || vp->class != class) {
-		printf("XmatchVisualInfo failed: want depth %d class %d\n",
-			depth, class);
+		DPRINTF("XmatchVisualInfo failed: want depth %d class %d\n", depth, class);
 		return 0;
 	}
 

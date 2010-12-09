@@ -56,6 +56,13 @@
 #define _XCreateMutex(lock)
 #define _XFreeMutex(lock)
 
+/* debug defines*/
+#if DEBUG
+#define DPRINTF(str, args...)   fprintf(stderr, str, ##args)  /* debug output*/
+#else
+#define DPRINTF(str, ...)									  /* no debug output*/
+#endif
+
 /* Used internally for the colormap */
 typedef struct  {
 	GR_PIXELVAL	value;

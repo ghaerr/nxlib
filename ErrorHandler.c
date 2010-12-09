@@ -6,7 +6,7 @@ void
 _nxErrorHandler(GR_EVENT * event)
 {
 	/* Fixme:  Determine and send the display value here */
-	printf("XIOErrorHandler called\n");
+	DPRINTF("XIOErrorHandler called\n");
 	if (_errorfunc)
 		_errorfunc(0);
 

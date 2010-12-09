@@ -8,60 +8,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "nxlib.h"
 
-#define DEBUG	0
-
-#if DEBUG
-#define DPRINTF(str, args...)   fprintf(stderr, str, ##args)  /* debug output*/
-#else
-#define DPRINTF(str, ...)									  /* no debug output*/
-#endif
-
-/*
- * Default pcf/truetype/type1 font directory list, add directories if desired.
- *
- * Each directory in this list with a fonts.dir file will be 
- * included with font enumeration.  The font can then be loaded
- * using either the XLFD specification or the filename spec in the fonts.dir file.
- * This is the case for almost all .pcf and .pcf.gz files.
- *
- * For files not included in fonts.dir files:
- * Truetype files will be found by filename.ttf if in a directory
- * PCF files will be found by filename.pcf or filename.pcf.gz if in a directory
- * Adobe Type1 files will be found by filename.pfb if in a directory
- */
-static char *FONT_DIR_LIST[] = {
-	"fonts",									/* local font dir w/fonts.alias*/
-	"/usr/share/fonts/X11/misc",				/* pcf fonts w/fonts.dir*/
-	"/usr/share/fonts/X11/100dpi",
-	"/usr/share/fonts/truetype/freefont",		/* truetype fonts, no fonts.dir*/
-	"/usr/share/fonts/truetype/ttf-dejavu",
-	"/usr/share/fonts/truetype/openoffice",
-	"/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType",	/* truetype fonts, w/fonts.dir & fonts.scale*/
-	"/usr/share/fonts/X11/Type1",				/* t1lib type1 .pfb fonts, w/fonts.dir*/
-	0
-};
-
-#if HAVE_STATICFONTS
-typedef struct {
-  char *	file;
-  char *	xlfd;
-  unsigned char *data;
-  int 		data_size;
-} nxStaticFontList;
-
-
-extern unsigned char dejavusansbold[572908];
-extern unsigned char dejavusans[622020];
-extern unsigned char dejavusansmono[320812];
-
-static nxStaticFontList staticFontList[] = {
-	{"DejaVuSans.ttf","-misc-helvetica-medium-r-normal--0-0-0-0-p-0-iso10646-1",dejavusans,sizeof(dejavusans)},
-	{"DejaVuSans-Bold.ttf","-misc-helvetica-bold-r-normal--0-0-0-0-p-0-iso10646-1",dejavusansbold,sizeof(dejavusansbold)},
-	{"DejaVuSans-Mono.ttf","-misc-courier-medium-r-normal--0-0-0-0-p-0-iso10646-1",dejavusansmono,sizeof(dejavusansmono)},
-	{NULL,NULL,NULL,0}
-};
-#endif
+/* fontlist.c*/
+extern char *FONT_DIR_LIST[]; 				/* pcf/truetype/type1 font dir list*/
+extern nxStaticFontList staticFontList[];	/* static font dir list*/
 
 /* font device-independent routines - font_find.c*/
 char *font_findfont(char *name, int height, int width, int *return_height);
@@ -102,7 +53,11 @@ openfontalias(char *str)
 static void
 _nxSetDefaultFontDir(void)
 {
-	int ndirs = (sizeof(FONT_DIR_LIST) / sizeof(char *)) - 1;
+	int ndirs;
+
+	/* count number of directories in structure*/
+	for (ndirs = 0; FONT_DIR_LIST[ndirs]; ndirs++)
+		continue;
 
 	_nxSetFontDir(FONT_DIR_LIST, ndirs);
 }
@@ -914,7 +869,7 @@ XLoadFont(Display * dpy, _Xconst char *name)
 			font = GrCreateFontEx((GR_CHAR *)fontname, height, height, NULL);
 	}
 
-printf("XLoadFont('%s') = '%s' height %d [%d]\n", name, fontname, height, font);
+DPRINTF("XLoadFont('%s') = '%s' height %d [%d]\n", name, fontname, height, font);
 	if (fontname)
 		Xfree(fontname);
 	return font;
@@ -974,14 +929,14 @@ XCreateFontSet(Display *display, _Xconst char *base_font_name_list,
 Bool
 XGetFontProperty(XFontStruct * font, Atom atom, unsigned long *value_return)
 {
-printf("XGetFontProperty called\n");
+DPRINTF("XGetFontProperty called\n");
 	switch (atom) {
 	case XA_FONT:			/* 18*/
 	case XA_UNDERLINE_POSITION:	/* 51*/
 	case XA_UNDERLINE_THICKNESS:	/* 52*/
 		break;
 	default:
-		printf("XGetFontProperty: Unknown FontProperty Atom %d\n", (int)atom);
+		DPRINTF("XGetFontProperty: Unknown FontProperty Atom %d\n", (int)atom);
 	}
 	return 0;
 }

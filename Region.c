@@ -66,7 +66,7 @@ XUnionRectWithRegion(XRectangle *rect, Region source, Region dest)
 		return 0;
 
 	if (source != dest)
-		printf("XUnionRectWithRegion - Source and dest different FIXME\n");
+		DPRINTF("XUnionRectWithRegion - Source and dest different FIXME\n");
 
 	/* copy rect since dimensions differ*/
 	gr_rect.x = rect->x;

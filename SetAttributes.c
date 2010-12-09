@@ -4,7 +4,7 @@ int
 XChangeWindowAttributes(Display * display, Window w, unsigned long valuemask,
 			XSetWindowAttributes * attributes)
 {
-printf("XChangeWindowAttributes: valuemask 0x%X\n", (int)valuemask);
+DPRINTF("XChangeWindowAttributes: valuemask 0x%X\n", (int)valuemask);
 
 	if (valuemask & CWBackPixel)
 		XSetWindowBackground(display, w, attributes->background_pixel);
@@ -52,10 +52,10 @@ XSetLineAttributes(Display * display, GC gc, unsigned int line_width,
 	}
 
 	if (line_width > 1)
-		printf("XSetLineAttributes: width %d\n", line_width);
+		DPRINTF("XSetLineAttributes: width %d\n", line_width);
 
 	if (join_style != JoinMiter)
-		printf("XSetLineAttributes: We don't support join style yet\n");
+		DPRINTF("XSetLineAttributes: We don't support join style yet\n");
 
 	GrSetGCLineAttributes(gc->gid, ls);
 	return 1;
