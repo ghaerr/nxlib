@@ -496,11 +496,14 @@ DPRINTF("putImage: bpp %d\n", image->depth);
 					//cl = colormap->colorval[0].value;
 					cl = 0;
 				break;
+
+			default:
+				cl = 0;
+				break;
 			}
 
 			if (cl < colormap->cur_color)
-				*dst = (unsigned long) colormap->colorval[cl].
-					value;
+				*dst = (unsigned long) colormap->colorval[cl].value;
 			else {
 				// FIXME colors kluged as if truecolor here...
 				// (no colormap entries...)

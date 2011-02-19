@@ -6,7 +6,7 @@ XStoreName(Display *dpy, Window w, _Xconst char *name)
 	GR_WM_PROPERTIES	props;
 
 	props.flags = GR_WM_FLAGS_TITLE;
-	props.title = (GR_CHAR *)name;
+	props.title = (char *)name;
 	GrSetWMProperties(w, &props);
 	return 1;	// FIXME should return atom #
 }

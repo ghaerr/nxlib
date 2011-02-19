@@ -139,7 +139,7 @@ XChangeProperty(Display * display, Window w, Atom property,
 			break;
 		case XA_WM_NAME:
 			props.flags = GR_WM_FLAGS_TITLE;
-			props.title = prop->data;
+			props.title = (char *)prop->data;
 			GrSetWMProperties(w, &props);
 			break;
 		default:

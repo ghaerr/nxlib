@@ -271,7 +271,8 @@ translateNXEvent(Display *dpy, GR_EVENT * ev, XEvent * event)
 				event->xdestroywindow.window = pev->subwid;
 			} else if (pev->utype == GR_UPDATE_MOVE ||
 				   pev->utype == GR_UPDATE_SIZE ||
-				   pev->utype == GR_UPDATE_REPARENT) {
+				   pev->utype == GR_UPDATE_REPARENT ||
+				   pev->utype == GR_UPDATE_ACTIVATE) {
 				/*
 				 * FIXME: FLTK hack - for the time being, we
 				 * handle GR_UPDATE_REPARENT as a ConfigureNotify

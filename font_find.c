@@ -862,11 +862,11 @@ XLoadFont(Display * dpy, _Xconst char *name)
 			font = GrCreateFontFromBuffer(data, size, "TTF", height, height);
 		else
 #endif
- 		font = GrCreateFontEx((GR_CHAR *)fontname, height, height, NULL);
+ 		font = GrCreateFontEx(fontname, height, height, NULL);
 	} else if (!strcmp(name, "fixed")) {
 		fontname = font_findfont("6x13", 0, 0, &height);
 		if (fontname)
-			font = GrCreateFontEx((GR_CHAR *)fontname, height, height, NULL);
+			font = GrCreateFontEx(fontname, height, height, NULL);
 	}
 
 DPRINTF("XLoadFont('%s') = '%s' height %d [%d]\n", name, fontname, height, font);

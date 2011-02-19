@@ -1,3 +1,6 @@
+19 Feb 2011
+	* handle GR_UPDATE_ACTIVATE in translateNXEvent for FLTK 1.1.10 (Martin)
+	* fixes for GR_CHAR * nano-X change
 9 Dec 2010
 	* moved all printf to DPRINTF, print only when DEBUG set in Makefile, added -O3 optimize
 	* added stubs for FLTK 1.3: XIMOfIC, XLocaleOfIM (Johannes)
