@@ -1,9 +1,10 @@
 29 Jul 2011
-	 * support for FLTK 1.3.0
-	 * preserve height info when aliasing to scaleable font filename (allows non-XLFD aliases)
-	 * fixed mixed tabs and space handling in fonts.alias files (allows names w/spaces)
-	 * add XListFont special case handling of 'fixed' fontspec, always returns 'fixed'
-	 * fix XLoadFont special case handling of 'fixed' fontspec (use mwin SystemFixed)
+	* support for FLTK 1.3.0
+	* preserve height info when aliasing to scaleable font filename (allows non-XLFD aliases)
+	* fixed mixed tabs and space handling in fonts.alias files (allows names w/spaces)
+	* add fonts.alias handling to XListFont
+	* add XListFont special case handling of 'fixed' fontspec, always returns 'fixed'
+	* fix XLoadFont special case handling of 'fixed' fontspec (use mwin SystemFixed)
 19 Feb 2011
 	* handle GR_UPDATE_ACTIVATE in translateNXEvent for FLTK 1.1.10 (Martin)
 	* fixes for GR_CHAR * nano-X change
