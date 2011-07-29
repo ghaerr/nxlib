@@ -17,10 +17,10 @@ extern nxStaticFontList staticFontList[];	/* static font dir list*/
 /* font device-independent routines - font_find.c*/
 char *font_findfont(char *name, int height, int width, int *return_height);
 int font_findalias(int index, const char *fontspec, char *alias);
-char **font_enumfonts(char *pattern, int maxnames, int *count_return);
+char **font_enumfonts(char *pattern, int maxnames, int *count_return, int chkalias);
 void font_freefontnames(char **fontlist);
 
-static char **findXLFDfont(char *pattern, int maxnames, int *count);
+static char **findXLFDfont(char *pattern, int maxnames, int *count, int chkalias);
 static FILE * _nxOpenFontDir(char *str);
 static void _nxSetDefaultFontDir(void);
 static void _nxSetFontDir(char **directories, int ndirs);
@@ -272,6 +272,7 @@ findfont_wildcard(char *pattern, int maxnames, struct _list *fontlist)
 {
 	int f, i;
 
+DPRINTF("findfont_wildcard: '%s' maxnames %d\n", pattern, maxnames);
 	/* loop through each font dir and read fonts.dir*/
 	for (f = 0; f < _nxfontcount; f++) {
 		FILE *fontdir = _nxOpenFontDir(_nxfontlist[f]);
@@ -369,18 +370,20 @@ comparefunc(const void* a, const void* b)
 }
 
 /* enumerate fonts matching passed XLFD pattern*/
-char **font_enumfonts(char *pattern, int maxnames, int *count_return)
+char **font_enumfonts(char *pattern, int maxnames, int *count_return, int chkalias)
 {
 	char **fontlist;
 	int count;
 
-	fontlist = findXLFDfont(pattern, maxnames, &count);
+DPRINTF("font_enumfonts: '%s' maxnames %d\n", pattern, maxnames);
+	fontlist = findXLFDfont(pattern, maxnames, &count, chkalias);
 	*count_return = count;
 
 	/* sort the return, helps for lack of locale info at end of XLFD*/
 	if (fontlist)
 		qsort((char *)fontlist, count, sizeof(char *), comparefunc);
 
+DPRINTF("font_enumfonts: return count %d\n", count);
 	return fontlist;
 }
 
@@ -412,7 +415,8 @@ any(int c, const char *str)
 }
 
 /* check if passed fontspec is aliased in fonts.alias file*/
-int font_findalias(int index, const char *fontspec, char *alias)
+int
+font_findalias(int index, const char *fontspec, char *alias)
 {
 	FILE *aliasfile;
 	int match = 0;
@@ -432,9 +436,10 @@ int font_findalias(int index, const char *fontspec, char *alias)
 				continue;
 
 			/* fontname is first space separated field*/
-			p = strchr(buffer, ' ');
+			/* check for tab first as filename may have spaces*/
+			p = strchr(buffer, '\t');
 			if (!p)
-				p = strchr(buffer, '\t');
+				p = strchr(buffer, ' ');
 			if (!p)
 				continue;
 			*p = '\0';
@@ -446,7 +451,7 @@ int font_findalias(int index, const char *fontspec, char *alias)
 				do ++p; while (*p == ' ' || *p == '\t');
 
 				strcpy(alias, p);
-DPRINTF("font_findalias: replacing %s with  %s\n", fontspec, alias);
+DPRINTF("font_findalias: replacing %s with %s\n", fontspec, alias);
 				match = 1;
 				break;
 			}
@@ -506,6 +511,11 @@ findfont_nowildcard(const char *fontspec, int *height)
 
 	if (!_nxfontcount)
 		_nxSetDefaultFontDir();
+
+DPRINTF("findfont_nowildcard: '%s'\n", fontspec);
+
+	/* set zero return height for cases where we don't have info*/
+	*height = 0;
 
 	/* first check for whole path specfied.  If so, return as is*/
 	if (fontspec[0] == '/')
@@ -714,15 +724,28 @@ DPRINTF("findfont_nowild: fail\n");
 /*
  * Search font directory fonts.dir files and return list of XLFD's that match with wildchars,
  * or return exact one that matches without wildchars.
- * fonts.alias is not used with this function.
+ * For each font dir, fonts.alias is checked for matching pattern and replaced
  */
 static char **
-findXLFDfont(char *pattern, int maxnames, int *count)
+findXLFDfont(char *pattern, int maxnames, int *count, int chkalias)
 {
 	struct _list *fontlist = _createFontList();
+	int f;
 
 	if (!_nxfontlist)
 		_nxSetDefaultFontDir();
+
+	/* loop through each font dir and read fonts.alias*/
+	if (chkalias) {
+		for (f = 0; f < _nxfontcount; f++) {
+			char alias[256];
+
+			/* rewrite pattern if aliased and start over*/
+			//FIXME infinite recursion!
+			if (font_findalias(f, pattern, alias))
+				return findXLFDfont(alias, maxnames, count, chkalias);
+		}
+	}
 
 	if (pattern[0] == '-' && (any('*', pattern) || any('?', pattern)))
 		findfont_wildcard(pattern, maxnames, fontlist);
@@ -732,6 +755,13 @@ findXLFDfont(char *pattern, int maxnames, int *count)
 
 		/* check for no wildcard match*/
 		fontfile = findfont_nowildcard(pattern, &dummy_height);
+
+		/* special case handling for 'fixed' - return 'fixed'*/
+		if (!fontfile && !strcmp(pattern, "fixed")) {
+DPRINTF("XListFont: forcing add 'fixed' to list\n");
+			fontfile = strdup("fixed");		/* faked to force add pattern to list*/
+		}
+
 		if(fontfile) { 			/* there's a perfect match */
 			free(fontfile); 	/* free because of strdup */
 			_addFontToList(fontlist, pattern);
@@ -777,14 +807,14 @@ font_findstaticfont(char *fontname, unsigned char** data, int* size) {
  *
  * If no font is loaded, NULL is returned.
  */
-char *font_findfont(char *name, int height, int width, int *return_height)
+char *
+font_findfont(char *name, int height, int width, int *return_height)
 {
 	char *	   fontpath = NULL;
 	char **	   fontlist = NULL;
 	int f;
 
-DPRINTF("findfont: START %s %d,%d\n", name, height, width);
-
+DPRINTF("findfont: START %s h/w %d,%d\n", name, height, width);
 	if (!_nxfontcount)
 		_nxSetDefaultFontDir();
 
@@ -804,7 +834,7 @@ DPRINTF("findfont: START %s %d,%d\n", name, height, width);
 		int count;
 
 		/* enumerate XLFD fonts matching spec*/
-		fontlist = font_enumfonts(name, 10000, &count);
+		fontlist = font_enumfonts(name, 10000, &count, 0);
 		if (fontlist) {
 			int i, okindex = 0;
 			for (i = 0; i < count; ++i) {
@@ -828,6 +858,11 @@ DPRINTF("findfont: FINI wild %s %d %d = '%s' height %d\n", fontlist[okindex], ok
 		 * If not XLFD search for filename prefix.
 		 */
 		fontpath = findfont_nowildcard(name, return_height);
+
+		/* set height info to reasonable value for aliased non-XLFD cases*/
+		if (*return_height == 0)
+			*return_height = (height? height: 13);
+
 DPRINTF("findfont: FINI nowild %s = %s height %d\n", name, fontpath, *return_height);
 	}
 
@@ -850,6 +885,7 @@ XLoadFont(Display * dpy, _Xconst char *name)
 	int height;
 	char *fontname;
 
+DPRINTF("XLoadFont('%s')\n", name);
 	/* first try to find XLFD or fontname from X11/fonts.dir and fonts.alias files*/
 	fontname = font_findfont((char *)name, 0, 0, &height);
 	if(fontname) {
@@ -864,15 +900,32 @@ XLoadFont(Display * dpy, _Xconst char *name)
 #endif
  		font = GrCreateFontEx(fontname, height, height, NULL);
 	} else if (!strcmp(name, "fixed")) {
-		fontname = font_findfont("6x13", 0, 0, &height);
-		if (fontname)
-			font = GrCreateFontEx(fontname, height, height, NULL);
+DPRINTF("XLoadFont: mapping 'fixed' to builtin SystemFixed\n");
+		/* special-case handle 'fixed' and map to builtin system fixed font*/
+		fontname = strdup(MWFONT_SYSTEM_FIXED);
+		height = 13;
+		font = GrCreateFontEx(fontname, 0, 0, NULL); /* height zero to force builtin lookup by name*/
 	}
 
 DPRINTF("XLoadFont('%s') = '%s' height %d [%d]\n", name, fontname, height, font);
 	if (fontname)
 		Xfree(fontname);
 	return font;
+}
+
+/* old ListFonts.c*/
+char **
+XListFonts(Display * display, _Xconst char *pattern, int maxnames,
+	int *actual_count_return)
+{
+	return font_enumfonts((char *)pattern, maxnames, actual_count_return, 1);
+}
+
+int
+XFreeFontNames(char **list)
+{
+	font_freefontnames(list);
+	return 1;
 }
 
 /* old SetPath.c*/

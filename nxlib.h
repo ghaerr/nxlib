@@ -99,7 +99,7 @@ typedef struct {
   int 		data_size;
 } nxStaticFontList;
 
-char **font_enumfonts(char *pattern, int maxnames, int *count_return);
+char **font_enumfonts(char *pattern, int maxnames, int *count_return, int chkalias);
 void   font_freefontnames(char **fontlist);
 char * font_findfont(char *name, int height, int width, int *return_height);
 int	   font_findstaticfont(char *fontname, unsigned char** data, int* size);

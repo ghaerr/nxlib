@@ -83,7 +83,7 @@ OBJS = DestWind.o MapWindow.o NextEvent.o OpenDis.o ClDisplay.o\
 	MapRaised.o RaiseWin.o LowerWin.o FillRct.o CrPixmap.o Clear.o\
 	MoveWin.o ClearArea.o UnmapWin.o RepWindow.o\
 	ChWindow.o Backgnd.o BdrWidth.o Border.o PmapBgnd.o\
-	fontlist.o font_find.o ListFonts.o UnloadFont.o QueryFont.o\
+	fontlist.o font_find.o UnloadFont.o QueryFont.o\
 	DefCursor.o UndefCurs.o CrCursor.o FontCursor.o\
 	CrBFData.o CrPFBData.o Region.o SelInput.o Atom.o\
 	QueryTree.o Image.o WindowProperty.o Misc.o SetWMProps.o Bell.o\
