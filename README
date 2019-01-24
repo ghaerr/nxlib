@@ -1,3 +1,8 @@
+**** NOTE **** NXLIB has been moved into the main Microwindows source tree
+               at microwindows/src/nx11 and is built by setting the config
+               file option NX11=Y. This tree is now unmaintained, use the
+               build in Microwindows instead.
+
 NXLIB X11 Emulation Library for Nano-X
 
 These source files build an X11 -> Nano-X conversion library,
